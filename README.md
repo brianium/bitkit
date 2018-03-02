@@ -25,3 +25,6 @@ may need to run `docker-compose` with the `--build` switch:
 ```
 $ docker-compose up --build
 ```
+
+The docker container exposes the web application on port 8080. You can visit the application
+locally at `http://localhost:8080/`
