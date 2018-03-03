@@ -1,16 +1,16 @@
+import os
 import numpy as np
 from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
 
 def make_connection_string():
-    ip = open("ip.txt").read()
-    conf = open("bitcoin.conf").read()
-    conf = dict(tuple(s.split("=")) for s in conf.split())
-    return "http://{}:{}@{}".format(conf["rpcuser"], conf["rpcpassword"], ip)
+    node_ip = os.environ['NODE_IP']
+    rpc_user = os.environ['RPC_USER']
+    rpc_password = os.environ['RPC_PASSWORD']
+    return "http://{}:{}@{}".format(rpc_user, rpc_password, node_ip)
 	
 connection_string = make_connection_string()
 def engine(commands):
 	return AuthServiceProxy(connection_string).batch_(commands)
-
 
 def get_satpb():
 	memtx = engine([["getrawmempool", True]])[0]
