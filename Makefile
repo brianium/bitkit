@@ -1,3 +1,7 @@
+.PHONY: docker-login
+docker-login:
+	docker login -u $(DOCKER_USER) -p $(DOCKER_PASSWORD)
+
 .PHONY: server-image
 server-image-build:
 	docker build -t scaturr/memcool .
@@ -10,4 +14,4 @@ server-image-push:
 server-image: server-image-build server-image-push
 
 .PHONY: deploy
-deploy: server-image
+deploy: docker-login server-image

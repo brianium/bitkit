@@ -5,6 +5,19 @@
 * [Docker](https://www.docker.com/)
 * [Docker Compose](https://docs.docker.com/compose/)
 * [Make](https://www.gnu.org/software/make/)
+* [direnv](https://direnv.net/)
+
+## Setup
+
+Set environment variables
+
+```
+$ direnv allow
+```
+
+You will need to run `direnv allow` any time the .envrc file changes
+
+Make sure you change `.envrc.sample` to fit your config needs
 
 ## Running
 
