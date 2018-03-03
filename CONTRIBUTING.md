@@ -40,3 +40,17 @@ As the PR owner:
 2. Wait for at least one positive review (optional for chores)
 3. **DON'T** merge the PR if there are negative reviews
 4. Request a second review after making significant changes
+
+## Deploying
+
+Deploying to production can be handled via the `deploy` make target
+
+```
+$ make deploy
+```
+
+This should typically be handled from CI
+
+Current production instance of the Go API is running at:
+
+[http://memcool-8d605723.671db959.svc.dockerapp.io/](http://memcool-8d605723.671db959.svc.dockerapp.io/)
