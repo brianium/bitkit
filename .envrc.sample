@@ -1,0 +1,2 @@
+export DOCKER_USER=mydockeruser
+export DOCKER_PASSWORD=mydockerpassword
