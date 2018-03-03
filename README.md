@@ -4,6 +4,7 @@
 
 * [Docker](https://www.docker.com/)
 * [Docker Compose](https://docs.docker.com/compose/)
+* [Make](https://www.gnu.org/software/make/)
 
 ## Running
 
