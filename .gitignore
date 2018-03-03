@@ -1,1 +1,4 @@
 .envrc
+bitcoin.conf
+ip.txt
+settings.json
