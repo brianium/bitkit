@@ -17,7 +17,7 @@ $ direnv allow
 
 You will need to run `direnv allow` any time the .envrc file changes
 
-Make sure you change `.envrc.sample` to fit your config needs
+Make sure you change `.envrc.sample` to `.envrc` to fit your config needs
 
 ## Running
 
