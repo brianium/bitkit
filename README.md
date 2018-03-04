@@ -6,6 +6,7 @@
 * [Docker Compose](https://docs.docker.com/compose/)
 * [Make](https://www.gnu.org/software/make/)
 * [direnv](https://direnv.net/)
+* [python3](https://www.python.org/)
 
 ## Setup
 
