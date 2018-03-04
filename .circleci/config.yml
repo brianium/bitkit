@@ -1,5 +1,23 @@
 version: 2
 jobs:
+  node:
+    working_directory: ~/memcool/node
+    docker:
+      - image: circleci/python:3.6-browsers
+    steps:
+      - checkout:
+          path: ~/memcool
+      - restore_cache:
+          key: py-{{ checksum "requirements.txt"}}          
+      - run: pip install --user -r requirements.txt
+      - save_cache:
+          paths:
+            - ~/.cache/pip
+          key: py-{{ checksum "requirements.txt" }}
+      - run: 
+          command: |
+            PATH=$PATH:~/.local/bin
+            pylint mempush.py
   build:
     machine: true
     steps:
@@ -14,6 +32,7 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
+      - node
       - build
       - deploy:
           filters:
