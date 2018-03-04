@@ -26,3 +26,7 @@ stop:
 
 .PHONY: restart
 restart: stop run
+
+.PHONY: migrate
+migrate:
+	pgmigrate -c $(POSTGRES_URI) -d db -t latest migrate
