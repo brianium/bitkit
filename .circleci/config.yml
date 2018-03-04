@@ -3,10 +3,8 @@ jobs:
   db:
     docker:
       - image: circleci/python:3.6-browsers
-    working_directory: ~/memcool/db
     steps:
-      - checkout:
-          path: ~/memcool
+      - checkout
       - run:
           command: |
             pip install --user yandex-pgmigrate
