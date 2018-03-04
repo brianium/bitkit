@@ -7,10 +7,14 @@
 * [Make](https://www.gnu.org/software/make/)
 * [direnv](https://direnv.net/)
 <<<<<<< HEAD
+<<<<<<< HEAD
 * [python3](https://www.python.org/)
 =======
 * [PGMigrate](https://github.com/yandex/pgmigrate)
 >>>>>>> Adds migrate target to Makefile
+=======
+* [PGMigrate](https://github.com/yandex/pgmigrate) - for database migrations
+>>>>>>> Configures build to depend on db job and update docs
 
 ## Setup
 
@@ -23,6 +27,12 @@ $ direnv allow
 You will need to run `direnv allow` any time the .envrc file changes
 
 Make sure you change `.envrc.sample` to `.envrc` to fit your config needs
+
+Run database migrations
+
+```
+$ make migrate
+```
 
 ## Running
 

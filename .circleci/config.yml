@@ -44,7 +44,13 @@ workflows:
     jobs:
       - node
       - build
-      - db
+      - db:
+          filters:
+            branches:
+              only:
+                - master
+              requires:
+                - build
       - deploy:
           filters:
             branches:
@@ -52,4 +58,3 @@ workflows:
                 - master
           requires:
             - db
-            - build
