@@ -1,9 +1,21 @@
 version: 2
 jobs:
-  node:
-    working_directory: ~/memcool/node
+  db:
     docker:
       - image: circleci/python:3.6-browsers
+    working_directory: ~/memcool/db
+    steps:
+      - checkout:
+          path: ~/memcool
+      - run:
+          command: |
+            pip install --user yandex-pgmigrate
+            PATH=$PATH:~/.local/bin
+            make migrate
+  node:
+    docker:
+      - image: circleci/python:3.6-browsers
+    working_directory: ~/memcool/node
     steps:
       - checkout:
           path: ~/memcool
@@ -34,10 +46,12 @@ workflows:
     jobs:
       - node
       - build
+      - db
       - deploy:
           filters:
             branches:
               only:
                 - master
           requires:
+            - db
             - build
