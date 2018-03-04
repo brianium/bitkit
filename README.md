@@ -6,15 +6,8 @@
 * [Docker Compose](https://docs.docker.com/compose/)
 * [Make](https://www.gnu.org/software/make/)
 * [direnv](https://direnv.net/)
-<<<<<<< HEAD
-<<<<<<< HEAD
 * [python3](https://www.python.org/)
-=======
 * [PGMigrate](https://github.com/yandex/pgmigrate)
->>>>>>> Adds migrate target to Makefile
-=======
-* [PGMigrate](https://github.com/yandex/pgmigrate) - for database migrations
->>>>>>> Configures build to depend on db job and update docs
 
 ## Setup
 
