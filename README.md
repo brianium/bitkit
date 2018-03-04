@@ -22,24 +22,20 @@ Make sure you change `.envrc.sample` to `.envrc` to fit your config needs
 
 ## Running
 
-To run the application use `docker-compose`:
+To run the application use `make run`:
 
 ```
-$ docker-compose up
-```
-
-Or to run in the background
-
-```
-$ docker-compose up -d
+$ make run
 ```
 
 Because Go programs are compiled, changes will not be reflected immediately. To see changes take effect you
-may need to run `docker-compose` with the `--build` switch:
-
-```
-$ docker-compose up --build
-```
+need to run `docker-compose` with the `--build` switch. The `run` target in the Makefile handles this for you.
 
 The docker container exposes the web application on port 8080. You can visit the application
 locally at `http://localhost:8080/`
+
+To stop use `make stop`. Or to stop, rebuild, and start again:
+
+```
+$ make restart
+```
