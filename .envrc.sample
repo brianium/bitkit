@@ -5,4 +5,5 @@ export RPC_USER=myrpcuser
 export RPC_PASSWORD=myrpcpassword
 export POSTGRES_PASSWORD=supersecret
 export POSTGRES_USER=memcool
+export POSTGRES_URI=postgresql://memcool:supersecret@localhost
 
