@@ -4,6 +4,8 @@ CREATE SCHEMA memcool;
 -- What indexes did we want?
 CREATE TABLE memcool.transactions (
     id VARCHAR(64) PRIMARY KEY,
-    fee_rate NUMERIC NOT NULL,
-    weight NUMERIC NOT NULL
+    fee_rate REAL NOT NULL,
+    weight INTEGER NOT NULL
 );
+
+CREATE INDEX fee_rate_idx ON memcool.transactions (fee_rate);
