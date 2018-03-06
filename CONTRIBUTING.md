@@ -41,6 +41,13 @@ As the PR owner:
 3. **DON'T** merge the PR if there are negative reviews
 4. Request a second review after making significant changes
 
+## Migrations
+
+Testing migrations is sort of a pain. Follow the conventions laid down by pgmigrate of a file name following the convention
+of `V<version>__<description>.sql`.
+
+Migrations will only be run on a merge into master, and deploys are contingent on their success.
+
 ## Deploying
 
 Deploying to production can be handled via the `deploy` make target
