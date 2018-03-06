@@ -27,6 +27,17 @@ Run database migrations
 $ make migrate
 ```
 
+You may want to setup `$GOPATH` correctly on your machine. This is optional, but may be
+desired for local tooling. The docker container for the go app has a working dir of `/go/src/app`.
+Creating a symlink from the `server` directory to your local `$GOPATH` should do the trick:
+
+```
+$ ln -s /Users/username/projects/memcool/server /Users/username/go/src/app
+```
+
+Where `username` is your own user name. The path examples above are conventional for mac systems - so adjusting
+for another system may be needed - i.e `/home/user/...` on a Linux system.
+
 ## Running
 
 To run the application use `make run`:
