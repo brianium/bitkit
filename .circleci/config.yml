@@ -45,16 +45,8 @@ workflows:
       - node
       - build
       - db:
-          filters:
-            branches:
-              only:
-                - master
           requires:
             - build
       - deploy:
-          filters:
-            branches:
-              only:
-                - master
           requires:
             - db
