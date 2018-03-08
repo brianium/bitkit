@@ -62,7 +62,7 @@ This should typically be handled from CI
 
 Current production instance of the Go API is running at:
 
-[http://memcool-8d605723.671db959.svc.dockerapp.io/](http://memcool-8d605723.671db959.svc.dockerapp.io/)
+[http://bitkit-production.4d0f65de.svc.dockerapp.io](http://bitkit-production.4d0f65de.svc.dockerapp.io)
 
 **staging**
-[http://memcool-37d789bf.1c69f935.svc.dockerapp.io:8080/](http://memcool-37d789bf.1c69f935.svc.dockerapp.io:8080/)
+[http://bitkit-staging.0ce25c51.svc.dockerapp.io:8080](http://bitkit-staging.0ce25c51.svc.dockerapp.io:8080)
