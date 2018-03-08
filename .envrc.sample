@@ -4,6 +4,6 @@ export NODE_IP=127.0.0.1:8332
 export RPC_USER=myrpcuser
 export RPC_PASSWORD=myrpcpassword
 export POSTGRES_PASSWORD=supersecret
-export POSTGRES_USER=memcool
-export POSTGRES_URI=postgresql://memcool:supersecret@localhost
+export POSTGRES_USER=bitkit
+export POSTGRES_URI=postgresql://bitkit:supersecret@localhost
 

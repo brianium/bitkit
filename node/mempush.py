@@ -1,9 +1,10 @@
 """
 This module is responsible for pushing mempool data
-to the memcool API
+to the bitkit API
 """
 import os
 from time import sleep
+import requests
 from bitcoinrpc.authproxy import AuthServiceProxy
 
 def make_connection_string():
@@ -37,7 +38,7 @@ def extract_and_transform(current_mempool, sent_txids):
     for txid, info in current_mempool.items():
         if txid not in sent_txids:
             fee = info['ancestorfees'] + info['descendantfees'] - float(info['fee']) * 1e8
-            size = info['ancestorsize'] + info['descendantsize'] - float(info['size'])
+            size = int(info['ancestorsize'] + info['descendantsize'] - float(info['size']))
             fee_rate = fee / size
             new_txs.append({'txid': txid, 'fee_rate': fee_rate, 'weight': size})
             sent_txids.add(txid)
@@ -49,11 +50,12 @@ def get_max_height(current_mempool):
     return max(info['height'] for _, info in current_mempool.items())
 
 def call_api(new_txs):
-    """Calls memcool api
+    """Calls bitkit api
     """
-    print(len(new_txs)) # replace with call to api
-    successful_post = True
-    return successful_post
+    uri = os.environ['BITKIT']
+    data = {"data":new_txs}
+    response = requests.post(uri, json=data)
+    return response.ok
 
 def main(sent_txids, max_height):
     """Main function in loop
@@ -66,6 +68,7 @@ def main(sent_txids, max_height):
     new_txs, potention_sent_txids = extract_and_transform(current_mempool, sent_txids)
     if call_api(new_txs):
         sent_txids = potention_sent_txids
+        print(len(new_txs))
     return sent_txids, max_height
 
 if __name__ == "__main__":

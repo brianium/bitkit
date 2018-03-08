@@ -13,10 +13,10 @@ jobs:
   node:
     docker:
       - image: circleci/python:3.6-browsers
-    working_directory: ~/memcool/node
+    working_directory: ~/bitkit/node
     steps:
       - checkout:
-          path: ~/memcool
+          path: ~/bitkit
       - restore_cache:
           key: py-{{ checksum "requirements.txt"}}          
       - run: pip install --user -r requirements.txt
