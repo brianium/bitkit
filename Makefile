@@ -7,12 +7,12 @@ endif
 
 # Set up commands based on stage
 ifeq ("$(STAGE)","production")
-	build = docker build -t scaturr/memcool server
-	push = docker push scaturr/memcool
+	build = docker build -t scaturr/bitkit server
+	push = docker push scaturr/bitkit
 	pguri = $(POSTGRES_URI)
 else
-	build = docker build -t scaturr/memcool:staging server
-	push = docker push scaturr/memcool:staging
+	build = docker build -t scaturr/bitkit:staging server
+	push = docker push scaturr/bitkit:staging
 	pguri = $(POSTGRES_STAGING_URI)
 endif
 
