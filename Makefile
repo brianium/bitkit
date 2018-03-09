@@ -5,6 +5,10 @@ else
 	STAGE = staging
 endif
 
+ifeq ("$(ENV)", "development")
+	STAGE = development
+endif
+
 # Set up commands based on stage
 ifeq ("$(STAGE)","production")
 	build = docker build -t scaturr/bitkit server
@@ -14,6 +18,10 @@ else
 	build = docker build -t scaturr/bitkit:staging server
 	push = docker push scaturr/bitkit:staging
 	pguri = $(POSTGRES_STAGING_URI)
+endif
+
+ifeq ("$(STAGE)","development")
+	pguri = $(subst db,localhost,$(POSTGRES_URI))
 endif
 
 .PHONY: docker-login
