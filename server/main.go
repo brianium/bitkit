@@ -27,6 +27,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/transactions", secured(env.transactions))
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello world"))
+	})
 	if os.Getenv("ENV") == "production" {
 		certManager := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
