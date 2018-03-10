@@ -12,21 +12,7 @@ type Transaction struct {
 	Weight  int     `json:"weight"`
 }
 
-// InsertTransactions does a batch insert of all the given transactions
-func (db *DB) InsertTransactions(transactions []*Transaction) (err error) {
-	txn, err := db.Begin()
-	if err != nil {
-		return
-	}
-
-	defer func() {
-		if err != nil {
-			txn.Rollback()
-			return
-		}
-		err = txn.Commit()
-	}()
-
+func insertTransactions(db *DB, transactions []*Transaction) error {
 	length := len(transactions)
 	valueStrings := make([]string, 0, length)
 	valueArgs := make([]interface{}, 0, length*3)
@@ -48,6 +34,52 @@ func (db *DB) InsertTransactions(transactions []*Transaction) (err error) {
     	weight = EXCLUDED.weight
 	`
 	stmt := fmt.Sprintf(sql, strings.Join(valueStrings, ","))
-	_, err = db.Exec(stmt, valueArgs...)
+	_, err := db.Exec(stmt, valueArgs...)
+	return err
+}
+
+// InsertTransactions does a batch insert of all the given transactions
+func (db *DB) InsertTransactions(transactions []*Transaction) (err error) {
+	txn, err := db.Begin()
+	if err != nil {
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			txn.Rollback()
+			return
+		}
+		err = txn.Commit()
+	}()
+
+	err = insertTransactions(db, transactions)
+
+	return
+}
+
+// ReplaceTransactions drops all transaction records and then does a batch insert
+func (db *DB) ReplaceTransactions(transactions []*Transaction) (err error) {
+	txn, err := db.Begin()
+	if err != nil {
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			txn.Rollback()
+			return
+		}
+		err = txn.Commit()
+	}()
+
+	// drop records first
+	_, err = db.Exec("DELETE FROM bitkit.transactions")
+	if err != nil {
+		return
+	}
+
+	err = insertTransactions(db, transactions)
+
 	return
 }
