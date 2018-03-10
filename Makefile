@@ -56,3 +56,7 @@ restart: stop run
 .PHONY: migrate
 migrate:
 	pgmigrate -c $(pguri) -d db -t latest migrate
+
+.PHONY: certs
+certs:
+	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server/key.pem -out server/cert.pem

@@ -1,2 +1,4 @@
 .envrc
 .vscode
+key.pem
+cert.pem

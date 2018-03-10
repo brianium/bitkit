@@ -8,3 +8,4 @@ export POSTGRES_USER=bitkit
 export POSTGRES_URI=postgresql://bitkit:supersecret@localhost
 export AUTH_USER=briry
 export AUTH_PASSWORD=secrets
+export ENV=development

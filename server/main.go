@@ -24,7 +24,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/transactions", secured(env.transactions))
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", mux))
 }
 
 // ********** API Handlers ********** //

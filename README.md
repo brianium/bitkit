@@ -27,6 +27,8 @@ Run database migrations
 $ make migrate
 ```
 
+Migrations should be run after `make restart` as well. TODO - add `migrate` task to `restart`. (tricky because you must wait for postgres to be up)
+
 You may want to setup `$GOPATH` correctly on your machine. This is optional, but may be
 desired for local tooling. The docker container for the go app has a working dir of `/go/src/app`.
 Creating a symlink from the `server` directory to your local `$GOPATH` should do the trick:
@@ -37,6 +39,18 @@ $ ln -s /Users/username/projects/bitkit/server /Users/username/go/src/app
 
 Where `username` is your own user name. The path examples above are conventional for mac systems - so adjusting
 for another system may be needed - i.e `/home/user/...` on a Linux system.
+
+### SSL
+
+A self signed cert is used for local development - and routes will only be accessible over `https`. To generate
+local certs, run:
+
+```
+$ make certs
+```
+
+Fill out the asked questions. You need to run `make restart` if the docker containers are already up and running. You may
+have to add an exception in your browser to make things work.
 
 ## Running
 
