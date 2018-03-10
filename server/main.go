@@ -23,9 +23,11 @@ func main() {
 	env := &Env{db}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/transactions", env.transactions)
+	mux.HandleFunc("/transactions", secured(env.transactions))
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
+
+// ********** API Handlers ********** //
 
 // TransactionsRequest models a request with multiple transaction from the mempool
 type TransactionsRequest struct {
@@ -61,4 +63,16 @@ func (env *Env) transactions(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// ********** Helper Functions ********** //
+func secured(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		username, password, ok := r.BasicAuth()
+		if ok && username == os.Getenv("AUTH_USER") && password == os.Getenv("AUTH_PASSWORD") {
+			handler(w, r)
+		} else {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		}
+	}
 }
