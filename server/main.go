@@ -29,7 +29,8 @@ func main() {
 
 // TransactionsRequest models a request with multiple transaction from the mempool
 type TransactionsRequest struct {
-	Data []*models.Transaction `json:"data"`
+	Data   []*models.Transaction `json:"data"`
+	Method string                `json:"method"`
 }
 
 func (env *Env) transactions(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +48,11 @@ func (env *Env) transactions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = env.db.InsertTransactions(txns.Data)
+	if txns.Method == "reset" {
+		err = env.db.ReplaceTransactions(txns.Data)
+	} else {
+		err = env.db.InsertTransactions(txns.Data)
+	}
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

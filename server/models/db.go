@@ -9,6 +9,7 @@ import (
 // Datastore represents the interface for accessing bitkit data
 type Datastore interface {
 	InsertTransactions(transactions []*Transaction) error
+	ReplaceTransactions(transactions []*Transaction) error
 }
 
 // DB is the type all database logic is implemented against
