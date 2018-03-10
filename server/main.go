@@ -2,10 +2,13 @@ package main
 
 import (
 	"app/models"
+	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net/http"
 	"os"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 // Env serves as the context the app runs in
@@ -24,7 +27,27 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/transactions", secured(env.transactions))
-	log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", mux))
+	if os.Getenv("ENV") == "production" {
+		certManager := autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist("api.bitkit.live"), //Your domain here
+			Cache:      autocert.DirCache("certs"),                //Folder for storing certificates
+		}
+
+		server := &http.Server{
+			Addr: ":https",
+			TLSConfig: &tls.Config{
+				GetCertificate: certManager.GetCertificate,
+			},
+			Handler: mux,
+		}
+
+		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
+
+		log.Fatal(server.ListenAndServeTLS("", ""))
+	} else {
+		log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", mux))
+	}
 }
 
 // ********** API Handlers ********** //
