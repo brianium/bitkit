@@ -11,12 +11,6 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
-// Env serves as the context the app runs in
-// All route handlers are implemented against this struct
-type Env struct {
-	db models.Datastore
-}
-
 func main() {
 	db, err := models.NewDB(os.Getenv("POSTGRES_URI") + "?sslmode=disable")
 	if err != nil {
@@ -25,16 +19,16 @@ func main() {
 
 	env := &Env{db}
 
+	// Define routes
 	mux := http.NewServeMux()
 	mux.HandleFunc("/transactions", secured(env.transactions))
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello world"))
-	})
+
+	// Handles a production environment
 	if os.Getenv("ENV") == "production" {
 		certManager := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
-			HostPolicy: autocert.HostWhitelist("api.bitkit.live"), //Your domain here
-			Cache:      autocert.DirCache("certs"),                //Folder for storing certificates
+			HostPolicy: autocert.HostWhitelist("api.bitkit.live"),
+			Cache:      autocert.DirCache("certs"),
 		}
 
 		server := &http.Server{
@@ -48,9 +42,15 @@ func main() {
 		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
 
 		log.Fatal(server.ListenAndServeTLS("", ""))
-	} else {
+	} else { // Handles the dev environment
 		log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", mux))
 	}
+}
+
+// Env serves as the context the app runs in
+// All route handlers are implemented against this struct
+type Env struct {
+	db models.Datastore
 }
 
 // ********** API Handlers ********** //
