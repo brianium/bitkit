@@ -1,7 +1,8 @@
 package models
 
 import (
-	"github.com/lib/pq"
+	"fmt"
+	"strings"
 )
 
 // Transaction represents a transaction in the mempool
@@ -26,23 +27,27 @@ func (db *DB) InsertTransactions(transactions []*Transaction) (err error) {
 		err = txn.Commit()
 	}()
 
-	stmt, err := txn.Prepare(pq.CopyInSchema("bitkit", "transactions", "id", "fee_rate", "weight"))
-	if err != nil {
-		return
-	}
-
+	length := len(transactions)
+	valueStrings := make([]string, 0, length)
+	valueArgs := make([]interface{}, 0, length*3)
+	i := 0
 	for _, transaction := range transactions {
-		_, err = stmt.Exec(transaction.ID, transaction.FeeRate, transaction.Weight)
-		if err != nil {
-			return
-		}
+		valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d)", i*3+1, i*3+2, i*3+3))
+		valueArgs = append(valueArgs, transaction.ID)
+		valueArgs = append(valueArgs, transaction.FeeRate)
+		valueArgs = append(valueArgs, transaction.Weight)
+		i++
 	}
 
-	_, err = stmt.Exec()
-	if err != nil {
-		return
-	}
-
-	err = stmt.Close()
+	sql := `
+	INSERT INTO bitkit.transactions (id, fee_rate, weight)
+	VALUES %s
+	ON CONFLICT (id)
+	DO UPDATE SET
+    	fee_rate = EXCLUDED.fee_rate,
+    	weight = EXCLUDED.weight
+	`
+	stmt := fmt.Sprintf(sql, strings.Join(valueStrings, ","))
+	_, err = db.Exec(stmt, valueArgs...)
 	return
 }
