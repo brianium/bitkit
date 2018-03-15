@@ -1,3 +1,15 @@
+# certs command
+gencerts = openssl req \
+    -newkey rsa:2048 \
+    -x509 \
+    -nodes \
+    -keyout server/key.pem \
+    -new \
+    -out server/cert.pem \
+    -subj /CN=localhost \
+    -sha256 \
+    -days 3650
+
 # setup the stage
 ifeq ("$(CIRCLE_BRANCH)", "master")
 	STAGE = production
@@ -11,10 +23,12 @@ endif
 
 # Set up commands based on stage
 ifeq ("$(STAGE)","production")
+	prebuild = echo "Building production image"
 	build = docker build -t scaturr/bitkit server
 	push = docker push scaturr/bitkit
 	pguri = $(POSTGRES_URI)
 else
+	prebuild = $(gencerts)
 	build = docker build -t scaturr/bitkit:staging server
 	push = docker push scaturr/bitkit:staging
 	pguri = $(POSTGRES_STAGING_URI)
@@ -30,6 +44,7 @@ docker-login:
 
 .PHONY: server-image-build
 server-image-build:
+	$(prebuild)
 	$(build)
 
 .PHONY: server-image-push
@@ -56,3 +71,8 @@ restart: stop run
 .PHONY: migrate
 migrate:
 	pgmigrate -c $(pguri) -d db -t latest migrate
+
+.PHONY: certs
+certs:
+	$(gencerts)
+	

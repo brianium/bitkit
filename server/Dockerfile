@@ -1,2 +1,4 @@
 FROM golang:1.8-onbuild
 EXPOSE 8080
+EXPOSE 443
+EXPOSE 80
