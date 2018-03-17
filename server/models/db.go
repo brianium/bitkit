@@ -10,6 +10,7 @@ import (
 type Datastore interface {
 	InsertTransactions(transactions []*Transaction) error
 	ReplaceTransactions(transactions []*Transaction) error
+	GetTransaction(id string) (*Transaction, error)
 }
 
 // DB is the type all database logic is implemented against

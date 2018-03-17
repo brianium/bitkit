@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -21,12 +22,9 @@ func main() {
 	env := &Env{db}
 
 	// Define routes
-	mux := http.NewServeMux()
+	mux := mux.NewRouter()
 	mux.HandleFunc("/transactions", secured(env.transactions))
-	mux.HandleFunc("/transaction", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte("{\"hello\": \"world\"}"))
-	})
+	mux.HandleFunc("/transaction/{id}", env.transaction)
 
 	handler := corsHandler().Handler(mux)
 
@@ -94,8 +92,26 @@ func (env *Env) transactions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// TransactionResponse represents a single found transaction
+type TransactionResponse struct {
+	Data *models.Transaction `json:"data"`
+}
+
+func (env *Env) transaction(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	txID := vars["id"]
+	tx, err := env.db.GetTransaction(txID)
+	if err != nil {
+		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&TransactionResponse{tx})
 }
 
 // ********** Helper Functions ********** //

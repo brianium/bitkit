@@ -7,9 +7,11 @@ import (
 
 // Transaction represents a transaction in the mempool
 type Transaction struct {
-	ID      string  `json:"txid"`
-	FeeRate float32 `json:"fee_rate"`
-	Weight  int     `json:"weight"`
+	ID               string  `json:"txid"`
+	FeeRate          float32 `json:"fee_rate"`
+	Weight           int     `json:"weight"`
+	TransactionCount int     `json:"transaction_count"`
+	TotalWeight      int     `json:"total_weight"`
 }
 
 func insertTransactions(db *DB, transactions []*Transaction) error {
@@ -82,4 +84,37 @@ func (db *DB) ReplaceTransactions(transactions []*Transaction) (err error) {
 	err = insertTransactions(db, transactions)
 
 	return
+}
+
+// GetTransaction returns a transaction record with a count of transactions ahead of it
+// and the total weight of all transactions being queried
+func (db *DB) GetTransaction(id string) (*Transaction, error) {
+	sql := `
+	WITH fr as (
+		SELECT id, fee_rate, weight
+		FROM bitkit.transactions
+		WHERE id = $1
+	)
+	SELECT fr.id, fr.fee_rate, fr.weight, COUNT(tx.id) as transaction_count, SUM(tx.weight) as total_weight
+	FROM bitkit.transactions as tx
+	JOIN fr ON tx.fee_rate > fr.fee_rate
+	GROUP BY fr.id, fr.fee_rate, fr.weight
+	`
+	stmt, err := db.Prepare(sql)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+	var (
+		txID             string
+		feeRate          float32
+		weight           int
+		transactionCount int
+		totalWeight      int
+	)
+	err = stmt.QueryRow(id).Scan(&txID, &feeRate, &weight, &transactionCount, &totalWeight)
+	if err != nil {
+		return nil, err
+	}
+	return &Transaction{txID, feeRate, weight, transactionCount, totalWeight}, nil
 }
