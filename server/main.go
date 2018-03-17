@@ -105,8 +105,7 @@ func (env *Env) transaction(w http.ResponseWriter, r *http.Request) {
 	txID := vars["id"]
 	tx, err := env.db.GetTransaction(txID)
 	if err != nil {
-		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
