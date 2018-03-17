@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/rs/cors"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -22,6 +23,12 @@ func main() {
 	// Define routes
 	mux := http.NewServeMux()
 	mux.HandleFunc("/transactions", secured(env.transactions))
+	mux.HandleFunc("/transaction", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("{\"hello\": \"world\"}"))
+	})
+
+	handler := corsHandler().Handler(mux)
 
 	// Handles a production environment
 	if os.Getenv("ENV") == "production" {
@@ -36,14 +43,14 @@ func main() {
 			TLSConfig: &tls.Config{
 				GetCertificate: certManager.GetCertificate,
 			},
-			Handler: mux,
+			Handler: handler,
 		}
 
 		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
 
 		log.Fatal(server.ListenAndServeTLS("", ""))
 	} else { // Handles the dev environment
-		log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", mux))
+		log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", handler))
 	}
 }
 
@@ -101,4 +108,15 @@ func secured(handler http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		}
 	}
+}
+
+func corsHandler() *cors.Cors {
+	allowed := "*"
+	if os.Getenv("ENV") == "production" {
+		allowed = "https://bitkit.live"
+	}
+	return cors.New(cors.Options{
+		AllowedOrigins: []string{allowed},
+		AllowedMethods: []string{"GET"},
+	})
 }
