@@ -5,6 +5,7 @@ to the bitkit API
 import os
 from time import sleep
 import requests
+from requests.auth import HTTPBasicAuth
 from bitcoinrpc.authproxy import AuthServiceProxy
 
 def make_connection_string():
@@ -22,12 +23,13 @@ def call_node(commands):
     return AuthServiceProxy(CONNECTION_STRING).batch_(commands)
 
 def get_mempool(verbose=True):
-    """Returns dictionary of form {txid1:{<info>}, txid2:{<info>}}
+    """Returns dictionary of form {txid1:{<info>}, txid2:{<info>}} and current block height
     info includes:
     size, fee, modifiedfee, time, height, descendantcount, descendantsize,
     descendantfees, ancestorcount, ancestorsize, ancestorfees, depends
     """
-    return call_node([["getrawmempool", verbose]])[0]
+    data = call_node([["getrawmempool", verbose], ["getblockcount"]])
+    return data[0], data[1]
 
 def extract_and_transform(current_mempool, sent_txids):
     """Given mempool snapshot and already sent transactions,
@@ -41,34 +43,30 @@ def extract_and_transform(current_mempool, sent_txids):
             size = int(info['ancestorsize'] + info['descendantsize'] - float(info['size']))
             fee_rate = fee / size
             new_txs.append({'txid': txid, 'fee_rate': fee_rate, 'weight': size})
-            sent_txids.add(txid)
-    return new_txs, sent_txids
+    return new_txs
 
-def get_max_height(current_mempool):
-    """Checks for new block
-    """
-    return max(info['height'] for _, info in current_mempool.items())
-
-def call_api(new_txs):
+def call_api(new_txs, method):
     """Calls bitkit api
     """
     uri = os.environ['BITKIT']
-    data = {"data":new_txs}
-    response = requests.post(uri, json=data)
+    data = {"method": method, "data":new_txs}
+    authy = HTTPBasicAuth(os.environ['AUTH_USER'], os.environ['AUTH_PASSWORD'])
+    response = requests.post(uri, json=data, verify=False, auth=authy)
     return response.ok
 
 def main(sent_txids, max_height):
     """Main function in loop
     """
-    current_mempool = get_mempool()
-    height = get_max_height(current_mempool)
+    current_mempool, height = get_mempool()
     if height > max_height:
         max_height = height
         sent_txids = set()
-    new_txs, potention_sent_txids = extract_and_transform(current_mempool, sent_txids)
-    if call_api(new_txs):
-        sent_txids = potention_sent_txids
-        print(len(new_txs))
+    new_txs = extract_and_transform(current_mempool, sent_txids)
+    method = "append" if sent_txids else "reset"
+    if call_api(new_txs, method):
+        sent_txids = sent_txids.union(t['txid'] for t in new_txs)
+    infostr = "height {}, method {}, new_txs {}, sent_txids {}"
+    print(infostr.format(height, method, len(new_txs), len(sent_txids)))
     return sent_txids, max_height
 
 if __name__ == "__main__":
