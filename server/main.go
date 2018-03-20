@@ -24,7 +24,7 @@ func main() {
 	// Define routes
 	mux := mux.NewRouter()
 	mux.HandleFunc("/transactions", secured(env.transactions))
-	mux.HandleFunc("/transaction/{id}", env.transaction)
+	mux.HandleFunc("/transactions/{id}", env.transaction)
 
 	handler := corsHandler().Handler(mux)
 

@@ -95,9 +95,9 @@ func (db *DB) GetTransaction(id string) (*Transaction, error) {
 		FROM bitkit.transactions
 		WHERE id = $1
 	)
-	SELECT fr.id, fr.fee_rate, fr.weight, COUNT(tx.id) as transaction_count, SUM(tx.weight) as total_weight
+	SELECT fr.id, fr.fee_rate, fr.weight, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight - fr.weight) as total_weight
 	FROM bitkit.transactions as tx
-	JOIN fr ON tx.fee_rate > fr.fee_rate
+	JOIN fr ON tx.fee_rate >= fr.fee_rate
 	GROUP BY fr.id, fr.fee_rate, fr.weight
 	`
 	stmt, err := db.Prepare(sql)
