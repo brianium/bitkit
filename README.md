@@ -8,6 +8,8 @@
 * [direnv](https://direnv.net/)
 * [python3](https://www.python.org/)
 * [PGMigrate](https://github.com/yandex/pgmigrate)
+* [Leiningen](https://leiningen.org/)
+* Java 8 (For Leiningen)
 
 ## Setup
 
