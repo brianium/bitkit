@@ -75,4 +75,7 @@ migrate:
 .PHONY: certs
 certs:
 	$(gencerts)
-	
+
+.PHONY: client
+client:
+	cd client/bitkit && lein clean && lein cljsbuild once min
