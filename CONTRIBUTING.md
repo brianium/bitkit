@@ -50,7 +50,7 @@ Migrations will only be run on a merge into master, and deploys are contingent o
 
 ## Deploying
 
-Deploying to production can be handled via the `deploy` make target
+Deploying the API to production can be handled via the `deploy` make target
 
 ```
 $ make deploy
@@ -66,3 +66,9 @@ Current production instance of the Go API is running at:
 
 **staging**
 [http://bitkit-staging.0ce25c51.svc.dockerapp.io:8080](http://bitkit-staging.0ce25c51.svc.dockerapp.io:8080)
+
+## Review Apps
+
+[netlify](https://www.netlify.com/) handles ClojureScript deployment. Merges into master will deploy the client app
+to production. Pull requests will generate a review app that can be tested prior to merging, and a link to the review
+app will be included in a GitHub comment.
