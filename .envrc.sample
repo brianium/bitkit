@@ -1,5 +1,4 @@
 export DOCKER_USER=mydockeruser
-export DOCKER_PASSWORD=mydockerpassword
 export NODE_IP=127.0.0.1:8332
 export RPC_USER=myrpcuser
 export RPC_PASSWORD=myrpcpassword
@@ -9,3 +8,4 @@ export POSTGRES_URI=postgresql://bitkit:supersecret@localhost
 export AUTH_USER=briry
 export AUTH_PASSWORD=secrets
 export ENV=development
+export GCLOUD_SERVICE_KEY=encodedjsonjams
