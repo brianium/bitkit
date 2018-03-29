@@ -9,15 +9,3 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
     ports:
       - "5432:5432"
-
-  web:
-    build: server
-    restart: always
-    depends_on:
-      - "db"
-    environment:
-      POSTGRES_URI: ${POSTGRES_URI}
-      AUTH_USER: ${AUTH_USER}
-      AUTH_PASSWORD: ${AUTH_PASSWORD}
-    ports:
-      - "8080:8080"

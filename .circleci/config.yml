@@ -29,15 +29,30 @@ jobs:
             PATH=$PATH:~/.local/bin
             pylint mempush.py
   build:
-    machine: true
+    machine: circleci/golang:1.8.7
     steps:
       - checkout
-      - run: make server-image-build
+      - run: mkdir -p /tmp/workspace
+      - run: make build
+      - run: mv deployment.zip /tmp/workspace
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - deployment.zip
   deploy:
-    machine: true
+    docker:
+      - image: circleci/python:3.6-browsers
     steps:
-      - checkout
-      - run: make deploy
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run: |
+          if [-e /tmp/workspace/deployment.zip]
+          then
+            echo "ok"
+          else
+            echo "not ok"
+          fi
 workflows:
   version: 2
   build_and_deploy:
