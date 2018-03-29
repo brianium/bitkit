@@ -51,11 +51,10 @@ jobs:
           at: /tmp/workspace
 
       - run: |
-          if [-e /tmp/workspace/deployment.zip]
-          then
-            echo "ok"
+          if [[-e /tmp/workspace/deployment.zip]]; then
+            echo "ok";
           else
-            echo "not ok"
+            echo "not ok";
           fi
 workflows:
   version: 2
