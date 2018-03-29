@@ -35,6 +35,8 @@ jobs:
       - checkout
       - run: mkdir -p /tmp/workspace
       - run: ln -s $(pwd)/server "$HOME/go/src/app"
+      - run: cd server && go get -d -v ./...
+      - run: cd server && go install -v ./...
       - run: make build
       - run: mv deployment.zip /tmp/workspace
       - persist_to_workspace:
