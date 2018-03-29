@@ -29,7 +29,8 @@ jobs:
             PATH=$PATH:~/.local/bin
             pylint mempush.py
   build:
-    machine: circleci/golang:1.8.7
+    docker: 
+      - image: circleci/golang:1.8.7
     steps:
       - checkout
       - run: mkdir -p /tmp/workspace
