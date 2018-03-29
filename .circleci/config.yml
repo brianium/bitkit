@@ -34,6 +34,7 @@ jobs:
     steps:
       - checkout
       - run: mkdir -p /tmp/workspace
+      - run: mkdir -p "$HOME/go/src/app"
       - run: ln -s $(pwd)/server "$HOME/go/src/app"
       - run: cd server && go get -d -v ./...
       - run: cd server && go install -v ./...
