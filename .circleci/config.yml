@@ -63,9 +63,6 @@ workflows:
     jobs:
       - node
       - build
-      - db:
-          requires:
-            - build
       - deploy:
           requires:
-            - db
+            - build
