@@ -36,7 +36,7 @@ desired for local tooling. The docker container for the go app has a working dir
 Creating a symlink from the `server` directory to your local `$GOPATH` should do the trick:
 
 ```
-$ ln -s /Users/username/projects/bitkit/server /Users/username/go/src/app
+$ ln -s /Users/username/projects/bitkit/server /Users/username/go/src/server
 ```
 
 Where `username` is your own user name. The path examples above are conventional for mac systems - so adjusting
