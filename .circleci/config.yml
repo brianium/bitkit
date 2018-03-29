@@ -34,8 +34,8 @@ jobs:
     steps:
       - checkout
       - run: mkdir -p /tmp/workspace
-      - run: mkdir -p "$HOME/go/src"
-      - run: ln -s $(pwd)/server "$HOME/go/src/server"
+      - run: mkdir -p /go/src
+      - run: ln -s $(pwd)/server "/go/src/server"
       - run: cd server && go get -d -v ./...
       - run: make build
       - run: mv deployment.zip /tmp/workspace
