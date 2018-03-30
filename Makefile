@@ -10,24 +10,6 @@ gencerts = openssl req \
     -sha256 \
     -days 3650
 
-# setup the stage
-ifeq ("$(CIRCLE_BRANCH)", "master")
-	STAGE = production
-else
-	STAGE = staging
-endif
-
-ifeq ("$(ENV)", "development")
-	STAGE = development
-endif
-
-# Set up commands based on stage
-ifeq ("$(STAGE)","staging")
-	pguri = $(POSTGRES_URI_STAGING)
-else
-	pguri = $(POSTGRES_URI)
-endif
-
 .PHONY: startdb
 startdb:
 	docker-compose up --build -d
@@ -41,7 +23,7 @@ restartdb: startdb stopdb
 
 .PHONY: migrate
 migrate:
-	pgmigrate -c $(pguri) -d db -t latest migrate
+	pgmigrate -c $(POSTGRES_URI) -d db -t latest migrate
 
 .PHONY: certs
 certs:
