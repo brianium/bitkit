@@ -55,7 +55,7 @@ jobs:
             PATH=$PATH:~/.local/bin
             aws lambda update-function-code \
              --function-name Bitkit \
-             --zip-file deployment.zip
+             --zip-file fileb:///tmp/workspace/deployment.zip
 
 workflows:
   version: 2
