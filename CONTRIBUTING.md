@@ -50,13 +50,7 @@ Migrations will only be run on a merge into master, and deploys are contingent o
 
 ## Deploying
 
-Deploying the API to production can be handled via the `deploy` make target
-
-```
-$ make deploy
-```
-
-This should typically be handled from CI
+Deployment occurs when a pull request is merged into master. It is done through the CI environment
 
 **production**
 
@@ -64,11 +58,10 @@ Current production instance of the Go API is running at:
 
 [https://api.bitkit.live](https://api.bitkit.live)
 
+The root API Gateway URL provided by amazon is
+
+[https://u5ganepu2f.execute-api.us-west-1.amazonaws.com/production/](https://u5ganepu2f.execute-api.us-west-1.amazonaws.com/production/)
+
 **staging**
-[http://bitkit-staging.0ce25c51.svc.dockerapp.io:8080](http://bitkit-staging.0ce25c51.svc.dockerapp.io:8080)
 
-## Review Apps
-
-[netlify](https://www.netlify.com/) handles ClojureScript deployment. Merges into master will deploy the client app
-to production. Pull requests will generate a review app that can be tested prior to merging, and a link to the review
-app will be included in a GitHub comment.
+Review branches are available only for the UI at this time

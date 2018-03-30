@@ -49,7 +49,7 @@ func createRouter() *mux.Router {
 	// Define routes
 	mux := mux.NewRouter()
 	mux.HandleFunc("/transactions", secured(env.transactions))
-	mux.HandleFunc("/transactions/rando", env.randomTransaction).Methods("GET")
+	mux.HandleFunc("/transactions/random", env.randomTransaction).Methods("GET")
 	mux.HandleFunc("/transactions/{id}", env.transaction).Methods("GET")
 	return mux
 }

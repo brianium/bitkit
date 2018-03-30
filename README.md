@@ -2,8 +2,8 @@
 
 ## Requirements
 
-* [Docker](https://www.docker.com/)
-* [Docker Compose](https://docs.docker.com/compose/)
+* [Docker](https://www.docker.com/) (optional for dev)
+* [Docker Compose](https://docs.docker.com/compose/) (optional for dev)
 * [Make](https://www.gnu.org/software/make/)
 * [direnv](https://direnv.net/)
 * [python3](https://www.python.org/)
@@ -17,6 +17,12 @@ Set environment variables
 
 ```
 $ direnv allow
+```
+
+To get a running db (with docker):
+
+```
+$ make startdb
 ```
 
 You will need to run `direnv allow` any time the .envrc file changes
@@ -56,23 +62,16 @@ have to add an exception in your browser to make things work.
 
 ## Running
 
-To run the API use `make run`:
+To run the API use `go run` within the server directory:
 
 ```
-$ make run
+$ cd server && go run
 ```
 
-Because Go programs are compiled, changes will not be reflected immediately. To see changes take effect you
-need to run `docker-compose` with the `--build` switch. The `run` target in the Makefile handles this for you.
+Because Go programs are compiled, changes will not be reflected immediately. 
 
-The docker container exposes the web application on port 8080. You can visit the application
-locally at `http://localhost:8080/`
-
-To stop use `make stop`. Or to stop, rebuild, and start again:
-
-```
-$ make restart
-```
+The go app exposes the web application on port 8080. You can visit the application
+locally at `http://127.0.0.1:8080/`
 
 ## Client
 

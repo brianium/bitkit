@@ -1,15 +1,5 @@
 version: 2
 jobs:
-  db:
-    docker:
-      - image: circleci/python:3.6-browsers
-    steps:
-      - checkout
-      - run:
-          command: |
-            pip install --user yandex-pgmigrate
-            PATH=$PATH:~/.local/bin
-            make migrate
   node:
     docker:
       - image: circleci/python:3.6-browsers
@@ -62,11 +52,12 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      # - node
+      - node
       - build
       - deploy:
+          filters:
+            branches:
+              only:
+                - master
           requires:
             - build
-      - db:
-          requires:
-            - deploy
