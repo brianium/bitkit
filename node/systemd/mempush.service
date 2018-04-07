@@ -10,7 +10,7 @@ PIDFile=/home/ryan/mempush.pid
 ExecStart=/usr/bin/python3 /home/ryan/bitkit/node/mempush.py
 KillMode=process
 Restart=always
-TimeoutSec=120
+TimeoutSec=infinity
 RestartSec=30
 
 [Install]
