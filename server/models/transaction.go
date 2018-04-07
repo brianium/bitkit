@@ -118,3 +118,32 @@ func (db *DB) GetTransaction(id string) (*Transaction, error) {
 	}
 	return &Transaction{txID, feeRate, weight, transactionCount, totalWeight}, nil
 }
+
+// GetRandomTransaction returns a random transaction record with a count of transactions ahead of it
+// and the total weight of all transactions being queried
+func (db *DB) GetRandomTransaction() (*Transaction, error) {
+	sql := `
+	WITH fr as (
+		SELECT id, fee_rate, weight
+		FROM bitkit.transactions
+		OFFSET floor(random() * (select count(*)-1 from bitkit.transactions))
+		LIMIT 1
+	)
+	SELECT fr.id, fr.fee_rate, fr.weight, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
+	FROM bitkit.transactions as tx
+	JOIN fr ON tx.fee_rate >= fr.fee_rate
+	GROUP BY fr.id, fr.fee_rate, fr.weight
+	`
+	var (
+		txID             string
+		feeRate          float32
+		weight           int
+		transactionCount int
+		totalWeight      int
+	)
+	err := db.QueryRow(sql).Scan(&txID, &feeRate, &weight, &transactionCount, &totalWeight)
+	if err != nil {
+		return nil, err
+	}
+	return &Transaction{txID, feeRate, weight, transactionCount, totalWeight}, nil
+}

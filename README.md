@@ -8,6 +8,8 @@
 * [direnv](https://direnv.net/)
 * [python3](https://www.python.org/)
 * [PGMigrate](https://github.com/yandex/pgmigrate)
+* [Leiningen](https://leiningen.org/)
+* Java 8 (For Leiningen)
 
 ## Setup
 
@@ -54,7 +56,7 @@ have to add an exception in your browser to make things work.
 
 ## Running
 
-To run the application use `make run`:
+To run the API use `make run`:
 
 ```
 $ make run
@@ -71,3 +73,22 @@ To stop use `make stop`. Or to stop, rebuild, and start again:
 ```
 $ make restart
 ```
+
+## Client
+
+The client application is written in ClojureScript using the [re-frame](https://github.com/Day8/re-frame) framework.
+
+To start an interactive development environment, from within the `client` directory
+run:
+
+```
+$ lein figwheel
+```
+
+Production builds are done using:
+
+```
+$ make client
+```
+
+From the project root.

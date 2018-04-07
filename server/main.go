@@ -24,7 +24,8 @@ func main() {
 	// Define routes
 	mux := mux.NewRouter()
 	mux.HandleFunc("/transactions", secured(env.transactions))
-	mux.HandleFunc("/transactions/{id}", env.transaction)
+	mux.HandleFunc("/transactions/random", env.randomTransaction).Methods("GET")
+	mux.HandleFunc("/transactions/{id}", env.transaction).Methods("GET")
 
 	handler := corsHandler().Handler(mux)
 
@@ -104,6 +105,17 @@ func (env *Env) transaction(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	txID := vars["id"]
 	tx, err := env.db.GetTransaction(txID)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&TransactionResponse{tx})
+}
+
+func (env *Env) randomTransaction(w http.ResponseWriter, r *http.Request) {
+	tx, err := env.db.GetRandomTransaction()
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
