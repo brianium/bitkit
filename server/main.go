@@ -1,19 +1,44 @@
 package main
 
 import (
-	"app/models"
-	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net/http"
 	"os"
+	"server/models"
 
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/aws-lambda-go-api-proxy/gorillamux"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
+	// Handles a production environment
+	if os.Getenv("ENV") != "development" {
+		lambda.Start(Handler)
+	} else { // Handles the dev environment
+		router := createRouter()
+		handler := corsHandler().Handler(router)
+		log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", handler))
+	}
+}
+
+var initialized = false
+var gorillaLambda *gorillamux.GorillaMuxAdapter
+
+// Handler serves as the endpoint for the aws lambda function
+func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	if !initialized {
+		router := createRouter()
+		gorillaLambda = gorillamux.New(router)
+		initialized = true
+	}
+	return gorillaLambda.Proxy(req)
+}
+
+func createRouter() *mux.Router {
 	db, err := models.NewDB(os.Getenv("POSTGRES_URI") + "?sslmode=disable")
 	if err != nil {
 		log.Panic(err)
@@ -24,32 +49,9 @@ func main() {
 	// Define routes
 	mux := mux.NewRouter()
 	mux.HandleFunc("/transactions", secured(env.transactions))
-	mux.HandleFunc("/transactions/{id}", env.transaction)
-
-	handler := corsHandler().Handler(mux)
-
-	// Handles a production environment
-	if os.Getenv("ENV") == "production" {
-		certManager := autocert.Manager{
-			Prompt:     autocert.AcceptTOS,
-			HostPolicy: autocert.HostWhitelist("api.bitkit.live"),
-			Cache:      autocert.DirCache("certs"),
-		}
-
-		server := &http.Server{
-			Addr: ":https",
-			TLSConfig: &tls.Config{
-				GetCertificate: certManager.GetCertificate,
-			},
-			Handler: handler,
-		}
-
-		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
-
-		log.Fatal(server.ListenAndServeTLS("", ""))
-	} else { // Handles the dev environment
-		log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", handler))
-	}
+	mux.HandleFunc("/transactions/random", env.randomTransaction).Methods("GET")
+	mux.HandleFunc("/transactions/{id}", env.transaction).Methods("GET")
+	return mux
 }
 
 // Env serves as the context the app runs in
@@ -104,6 +106,17 @@ func (env *Env) transaction(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	txID := vars["id"]
 	tx, err := env.db.GetTransaction(txID)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&TransactionResponse{tx})
+}
+
+func (env *Env) randomTransaction(w http.ResponseWriter, r *http.Request) {
+	tx, err := env.db.GetRandomTransaction()
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return

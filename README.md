@@ -2,12 +2,14 @@
 
 ## Requirements
 
-* [Docker](https://www.docker.com/)
-* [Docker Compose](https://docs.docker.com/compose/)
+* [Docker](https://www.docker.com/) (optional for dev)
+* [Docker Compose](https://docs.docker.com/compose/) (optional for dev)
 * [Make](https://www.gnu.org/software/make/)
 * [direnv](https://direnv.net/)
 * [python3](https://www.python.org/)
 * [PGMigrate](https://github.com/yandex/pgmigrate)
+* [Leiningen](https://leiningen.org/)
+* Java 8 (For Leiningen)
 
 ## Setup
 
@@ -15,6 +17,12 @@ Set environment variables
 
 ```
 $ direnv allow
+```
+
+To get a running db (with docker):
+
+```
+$ make startdb
 ```
 
 You will need to run `direnv allow` any time the .envrc file changes
@@ -34,7 +42,7 @@ desired for local tooling. The docker container for the go app has a working dir
 Creating a symlink from the `server` directory to your local `$GOPATH` should do the trick:
 
 ```
-$ ln -s /Users/username/projects/bitkit/server /Users/username/go/src/app
+$ ln -s /Users/username/projects/bitkit/server /Users/username/go/src/server
 ```
 
 Where `username` is your own user name. The path examples above are conventional for mac systems - so adjusting
@@ -54,20 +62,32 @@ have to add an exception in your browser to make things work.
 
 ## Running
 
-To run the application use `make run`:
+To run the API use `go run` within the server directory:
 
 ```
-$ make run
+$ cd server && go run
 ```
 
-Because Go programs are compiled, changes will not be reflected immediately. To see changes take effect you
-need to run `docker-compose` with the `--build` switch. The `run` target in the Makefile handles this for you.
+Because Go programs are compiled, changes will not be reflected immediately. 
 
-The docker container exposes the web application on port 8080. You can visit the application
-locally at `http://localhost:8080/`
+The go app exposes the web application on port 8080. You can visit the application
+locally at `http://127.0.0.1:8080/`
 
-To stop use `make stop`. Or to stop, rebuild, and start again:
+## Client
+
+The client application is written in ClojureScript using the [re-frame](https://github.com/Day8/re-frame) framework.
+
+To start an interactive development environment, from within the `client` directory
+run:
 
 ```
-$ make restart
+$ lein figwheel
 ```
+
+Production builds are done using:
+
+```
+$ make client
+```
+
+From the project root.

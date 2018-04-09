@@ -1,0 +1,17 @@
+[Unit]
+Description=mempush
+After=network.target bitcoind.service
+
+[Service]
+EnvironmentFile=/home/ryan/systemdenv
+User=ryan
+Type=forking
+PIDFile=/home/ryan/mempush.pid
+ExecStart=/usr/bin/python3 /home/ryan/bitkit/node/mempush.py
+KillMode=process
+Restart=always
+TimeoutSec=infinity
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
