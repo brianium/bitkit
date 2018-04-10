@@ -5,4 +5,5 @@
 
 (defn main-panel []
   (let [name (re-frame/subscribe [::subs/name])]
-    [:div "Hello there from " @name]))
+    [:section.section
+     [:div.container "Hello there from " @name]]))
