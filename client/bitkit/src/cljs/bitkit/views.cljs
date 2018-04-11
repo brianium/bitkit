@@ -2,7 +2,7 @@
   (:require [re-frame.core :as re-frame]
             [reagent.core :as reagent]
             [bitkit.subs :as subs]
-            [bitkit.routes :refer [set-token!]]))
+            [bitkit.routes :refer [set-path!]]))
 
 (defn handler
   "Wraps an event handler function so that it first
@@ -15,7 +15,7 @@
 (defn transaction-form []
   (let [txid (reagent/atom "")]
     (fn [props]
-      [:form {:on-submit (handler #(set-token! (str "/" @txid)))}
+      [:form {:on-submit (handler #(set-path! (str "/" @txid)))}
        [:div.field
         [:label.label "Transaction ID"]
         [:div.control

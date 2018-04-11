@@ -9,8 +9,17 @@
 
 (def match (fnil identity {:handler :index}))
 
-(defonce history
-  (doto (Html5History.)
+(defonce history (Html5History.))
+
+(defn set-path!
+  [value]
+  (.setToken history value))
+
+(defn init-path! []
+  (set-path! (.. js/window -location -pathname)))
+
+(defn listen! []
+  (doto history
     (events/listen EventType.NAVIGATE
       (fn [event]
         (->> (.-token event)
@@ -19,10 +28,7 @@
           :handler
           (vector :set-route)
           re-frame/dispatch)))
-    (.setEnabled true)
     (.setUseFragment false)
-    (.setPathPrefix "")))
-
-(defn set-token!
-  [value]
-  (.setToken history value))
+    (.setPathPrefix "")
+    (.setEnabled true))
+  (init-path!))
