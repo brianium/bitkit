@@ -3,8 +3,8 @@
             [re-frame.core :as re-frame]
             [bitkit.events :as events]
             [bitkit.views :as views]
-            [bitkit.config :as config]))
-
+            [bitkit.config :as config]
+            [bitkit.routes :as routes]))
 
 (defn dev-setup []
   (when config/debug?
@@ -18,5 +18,6 @@
 
 (defn ^:export init []
   (re-frame/dispatch-sync [::events/initialize-db])
+  (routes/listen!)
   (dev-setup)
   (mount-root))

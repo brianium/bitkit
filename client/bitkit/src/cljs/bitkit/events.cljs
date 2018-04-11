@@ -6,3 +6,8 @@
  ::initialize-db
  (fn  [_ _]
    db/default-db))
+
+(re-frame/reg-event-db
+  :set-route
+  (fn [db [_ match]]
+    (.log js/console (clj->js match))))
