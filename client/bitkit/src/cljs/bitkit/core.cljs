@@ -3,8 +3,8 @@
             [re-frame.core :as re-frame]
             [bitkit.events :as events]
             [bitkit.views :as views]
-            [bitkit.config :as config]))
-
+            [bitkit.config :as config]
+            [bitkit.routes]))
 
 (defn dev-setup []
   (when config/debug?

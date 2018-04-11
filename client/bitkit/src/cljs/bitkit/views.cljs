@@ -1,9 +1,30 @@
 (ns bitkit.views
   (:require [re-frame.core :as re-frame]
+            [reagent.core :as reagent]
             [bitkit.subs :as subs]
-            ))
+            [bitkit.routes :refer [set-token!]]))
+
+(defn handler
+  "Wraps an event handler function so that it first
+  prevents the event default"
+  [func]
+  (fn [event]
+    (.preventDefault event)
+    (func event)))
+
+(defn transaction-form []
+  (let [txid (reagent/atom "")]
+    (fn [props]
+      [:form {:on-submit (handler #(set-token! (str "/" @txid)))}
+       [:div.field
+        [:label.label "Transaction ID"]
+        [:div.control
+         [:input.input
+          {:value     @txid
+           :on-change #(reset! txid (.. % -target -value))}]]
+        [:p.help "Bitcoin transaction id"]]])))
 
 (defn main-panel []
-  (let [name (re-frame/subscribe [::subs/name])]
-    [:section.section
-     [:div.container "Hello there from " @name]]))
+  [:section.section
+   [:div.container
+    [transaction-form]]])
