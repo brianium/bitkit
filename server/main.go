@@ -9,7 +9,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/aws-lambda-go-api-proxy/gorillamux"
+	"github.com/awslabs/aws-lambda-go-api-proxy/handlerfunc"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
@@ -26,16 +26,17 @@ func main() {
 }
 
 var initialized = false
-var gorillaLambda *gorillamux.GorillaMuxAdapter
+var handlerLambda *handlerfunc.HandlerFuncAdapter
 
 // Handler serves as the endpoint for the aws lambda function
 func Handler(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if !initialized {
 		router := createRouter()
-		gorillaLambda = gorillamux.New(router)
+		handler := corsHandler().Handler(router)
+		handlerLambda = handlerfunc.New(handler.ServeHTTP)
 		initialized = true
 	}
-	return gorillaLambda.Proxy(req)
+	return handlerLambda.Proxy(req)
 }
 
 func createRouter() *mux.Router {
@@ -140,9 +141,6 @@ func secured(handler http.HandlerFunc) http.HandlerFunc {
 
 func corsHandler() *cors.Cors {
 	allowed := "*"
-	if os.Getenv("ENV") == "production" {
-		allowed = "https://bitkit.live"
-	}
 	return cors.New(cors.Options{
 		AllowedOrigins: []string{allowed},
 		AllowedMethods: []string{"GET"},
