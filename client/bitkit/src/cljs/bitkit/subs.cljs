@@ -2,6 +2,6 @@
   (:require [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub
- ::name
+ ::transaction-id
  (fn [db]
-   (:name db)))
+   (or (:transaction-id db) "")))

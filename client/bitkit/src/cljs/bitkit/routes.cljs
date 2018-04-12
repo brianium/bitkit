@@ -1,7 +1,8 @@
 (ns bitkit.routes
   (:require [bidi.bidi :as bidi]
             [re-frame.core :as re-frame]
-            [goog.events :as events])
+            [goog.events :as gevents]
+            [bitkit.events :as events])
   (:import [goog.history EventType
                          Html5History]))
 
@@ -20,13 +21,12 @@
 
 (defn listen! []
   (doto history
-    (events/listen EventType.NAVIGATE
+    (gevents/listen EventType.NAVIGATE
       (fn [event]
         (->> (.-token event)
           (bidi/match-route routes)
           match
-          :handler
-          (vector :set-route)
+          (vector ::events/set-route)
           re-frame/dispatch)))
     (.setUseFragment false)
     (.setPathPrefix "")

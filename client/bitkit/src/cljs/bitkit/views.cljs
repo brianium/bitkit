@@ -13,15 +13,16 @@
     (func event)))
 
 (defn transaction-form []
-  (let [txid (reagent/atom "")]
+  (let [txid  @(re-frame/subscribe [::subs/transaction-id])
+        value (reagent/atom txid)]
     (fn [props]
-      [:form {:on-submit (handler #(set-path! (str "/" @txid)))}
+      [:form {:on-submit (handler #(set-path! (str "/" @value)))}
        [:div.field
         [:label.label "Transaction ID"]
         [:div.control
          [:input.input
-          {:value     @txid
-           :on-change #(reset! txid (.. % -target -value))}]]
+          {:value     @value
+           :on-change #(reset! value (.. % -target -value))}]]
         [:p.help "Bitcoin transaction id"]]])))
 
 (defn main-panel []
