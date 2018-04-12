@@ -6,7 +6,7 @@
   (:import [goog.history EventType
                          Html5History]))
 
-(defonce routes [["/" :id] :transaction])
+(defonce routes [["/" [#"\w+" :id]] :transaction])
 
 (def match (fnil identity {:handler :index}))
 

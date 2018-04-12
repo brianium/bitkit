@@ -11,13 +11,13 @@
 (defn transaction
   "Takes a transaction id and updates state with transaction
   data"
-  [cofx id]
-  {:db         (assoc-in cofx [:db :transaction-id] id)
+  [{:keys [db]} id]
+  {:db         (assoc db :transaction-id id)
    :http-xhrio {:method          :get
                 :uri             (str "https://api.bitkit.live/transactions/" id)
                 :response-format (ajax/json-response-format {:keywords? true})
-                :on-success      [:fetch-transaction-success]
-                :on-failure      [:fetch-transaction-error]}})
+                :on-success      [::fetch-transaction-success]
+                :on-failure      [::fetch-transaction-error]}})
 
 (defn index
   [cofx]
@@ -29,3 +29,16 @@
     (case handler
       :transaction (transaction cofx (:id route-params))
       (index cofx))))
+
+(re-frame/reg-event-fx
+  ::fetch-transaction-success
+  (fn [{:keys [db]} [_ response]]
+    {:db (-> db
+             (assoc :transaction (:data response))
+             (assoc :error nil))}))
+
+
+(re-frame/reg-event-db
+  ::fetch-transaction-error
+  (fn [db]
+    (merge db/default-db {:error :not-found})))
