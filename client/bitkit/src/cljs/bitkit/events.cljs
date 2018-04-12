@@ -37,7 +37,6 @@
              (assoc :transaction (:data response))
              (assoc :error nil))}))
 
-
 (re-frame/reg-event-db
   ::fetch-transaction-error
   (fn [db]

@@ -14,14 +14,14 @@
 
 (defn transaction-form
   [{:keys [txid]}]
-  (let [value (reagent/atom txid)]
+  (let [value (reagent/atom "")]
     (fn [{:keys [txid]}]
       [:form {:on-submit (handler #(set-path! (str "/" @value)))}
        [:div.field
         [:label.label "Transaction ID"]
         [:div.control
          [:input.input
-          {:value     @value
+          {:value     (or @value txid)
            :on-change #(reset! value (.. % -target -value))}]]
         [:p.help "Bitcoin transaction id"]]])))
 
