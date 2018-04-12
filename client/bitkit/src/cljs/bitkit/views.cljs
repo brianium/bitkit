@@ -2,6 +2,7 @@
   (:require [re-frame.core :as re-frame]
             [reagent.core :as reagent]
             [bitkit.subs :as subs]
+            [bitkit.events :as events]
             [bitkit.routes :refer [set-path!]]))
 
 (defn handler
@@ -14,16 +15,14 @@
 
 (defn transaction-form
   [{:keys [txid]}]
-  (let [value (reagent/atom "")]
-    (fn [{:keys [txid]}]
-      [:form {:on-submit (handler #(set-path! (str "/" @value)))}
-       [:div.field
-        [:label.label "Transaction ID"]
-        [:div.control
-         [:input.input
-          {:value     (if (empty? @value) txid @value)
-           :on-change #(reset! value (.. % -target -value))}]]
-        [:p.help "Bitcoin transaction id"]]])))
+  [:form {:on-submit (handler #(set-path! (str "/" txid)))}
+   [:div.field
+    [:label.label "Transaction ID"]
+    [:div.control
+     [:input.input
+      {:value     txid
+       :on-change #(re-frame/dispatch [::events/set-transaction-id (.. % -target -value)])}]]
+    [:p.help "Bitcoin transaction id"]]])
 
 (defn notification
   [{:keys [error]}]
@@ -43,8 +42,8 @@
      [:p (str "totaling " (:total_weight txn) " whatever units ryan tell me")]]))
 
 (defn main-panel []
-  (let [txid (re-frame/subscribe [::subs/transaction-id])
-        txn  (re-frame/subscribe [::subs/transaction])
+  (let [txid  (re-frame/subscribe [::subs/transaction-id])
+        txn   (re-frame/subscribe [::subs/transaction])
         error (re-frame/subscribe [::subs/error])]
     [:section.section
      [:div.container

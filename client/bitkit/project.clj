@@ -14,7 +14,8 @@
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
-  :figwheel {:css-dirs ["resources/public/css"]}
+  :figwheel {:css-dirs     ["resources/public/css"]
+             :ring-handler bitkit.dev-server/handler}
 
   :profiles
   {:dev
@@ -23,7 +24,7 @@
                    [figwheel-sidecar "0.5.13"]
                    [com.cemerick/piggieback "0.2.2"]]
 
-    :plugins      [[lein-figwheel "0.5.13"]]
+    :plugins [[lein-figwheel "0.5.13"]]
 
     :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}}
 

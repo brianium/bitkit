@@ -8,16 +8,21 @@
  (fn  [_ _]
    db/default-db))
 
+(re-frame/reg-event-db
+  ::set-transaction-id
+  (fn [db [_ id]]
+    (assoc db :transaction-id id)))
+
 (defn transaction
   "Takes a transaction id and updates state with transaction
   data"
   [{:keys [db]} id]
-  {:db         (assoc db :transaction-id id)
-   :http-xhrio {:method          :get
+  {:http-xhrio {:method          :get
                 :uri             (str "https://api.bitkit.live/transactions/" id)
                 :response-format (ajax/json-response-format {:keywords? true})
                 :on-success      [::fetch-transaction-success]
-                :on-failure      [::fetch-transaction-error]}})
+                :on-failure      [::fetch-transaction-error]}
+   :dispatch   [::set-transaction-id id]})
 
 (defn index
   [cofx]
