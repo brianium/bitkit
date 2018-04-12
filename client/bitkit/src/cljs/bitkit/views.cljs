@@ -21,7 +21,7 @@
         [:label.label "Transaction ID"]
         [:div.control
          [:input.input
-          {:value     (or @value txid)
+          {:value     (if (empty? @value) txid @value)
            :on-change #(reset! value (.. % -target -value))}]]
         [:p.help "Bitcoin transaction id"]]])))
 
