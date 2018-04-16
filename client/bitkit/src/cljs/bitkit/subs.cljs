@@ -1,7 +1,23 @@
 (ns bitkit.subs
   (:require [re-frame.core :as re-frame]))
 
+(def blocksize-in-bytes 1048576)
+
 (re-frame/reg-sub
- ::name
+ ::transaction-id
  (fn [db]
-   (:name db)))
+   (or (:transaction-id db) "")))
+
+(re-frame/reg-sub
+  ::error
+  (fn [db]
+    (:error db)))
+
+(re-frame/reg-sub
+  ::transaction
+  (fn [{:keys [transaction]}]
+    (when transaction
+      (let [{:keys [fee_rate, weight, total_weight]} transaction]
+        (-> transaction
+            (assoc :fee (* fee_rate weight))
+            (assoc :capacity_used (/ total_weight blocksize-in-bytes)))))))
