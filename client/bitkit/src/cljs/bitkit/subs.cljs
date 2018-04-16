@@ -1,7 +1,7 @@
 (ns bitkit.subs
   (:require [re-frame.core :as re-frame]))
 
-(def blocksize-in-bytes 4194304)
+(def blocksize-in-bytes 1048576)
 
 (re-frame/reg-sub
  ::transaction-id
