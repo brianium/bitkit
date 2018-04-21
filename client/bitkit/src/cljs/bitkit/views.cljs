@@ -15,7 +15,9 @@
 
 (defn transaction-form
   [{:keys [txid]}]
-  [:form.content {:on-submit (handler #(set-path! (str "/" txid)))}
+  [:form.content
+   {:on-submit
+    (handler #(re-frame/dispatch [::events/set-transaction txid]))}
    [:div.field
     [:label.label "Transaction ID"]
     [:div.control
