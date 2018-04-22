@@ -1,4 +1,6 @@
 (ns bitkit.db)
 
 (def default-db
-  {:name "re-frame"})
+  {:transaction-id nil
+   :transaction    nil
+   :error          nil})

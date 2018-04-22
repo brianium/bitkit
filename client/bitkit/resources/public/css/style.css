@@ -1,0 +1,19 @@
+/**
+ * Navbar
+ */
+.navbar {
+    background-color: #004A7C;
+    padding: 0 10px;
+}
+
+.navbar svg {
+    position: relative;
+    top: 2px;
+}
+
+/**
+ * List
+ */
+.is-unstyled {
+    list-style: none !important;
+}
