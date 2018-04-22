@@ -41,18 +41,40 @@
         [:li "The transaction has already been confirmed"]
         [:li "The transaction has been evicted"]]])))
 
+(defn interval-list
+  [& children]
+  (let [ref (atom nil)]
+    (reagent/create-class
+      {:component-did-update
+       (fn []
+         (-> @ref
+             .-classList
+             (.add "is-updated"))
+         (js/setTimeout
+           (fn []
+             (-> @ref
+                 .-classList
+                 (.remove "is-updated")))
+           1500))
+       :reagent-render
+       (fn [& children]
+         [:div.interval-list {:ref (fn [elem] (reset! ref elem))}
+          [:ul
+           {:class-name (str "is-marginless is-unstyled is-size-6")}
+           (map-indexed #(with-meta %2 {:key %1}) children)]])})))
+
 (defn transaction
   [{:keys [txn]}]
   (when txn
     [:section
      [:div.content.is-small
       [:h2 "Your transaction"]
-      [:ul.is-marginless.is-unstyled
+      [interval-list
        [:li (str "Fee: " (:fee txn) " satoshis")]
        [:li (str "Fee rate: " (:fee_rate txn) " satoshis per byte")]]]
      [:div.content.is-small
       [:h2 "Transactions with a higher fee rate"]
-      [:ul.is-marginless.is-unstyled
+      [interval-list
        [:li (str "Count: " (:transaction_count txn))]
        [:li (str "Block capacity used: " (:capacity_used txn))]]]]))
 
