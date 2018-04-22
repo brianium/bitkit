@@ -9,10 +9,12 @@
  (fn  [_ _]
    db/default-db))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
   ::set-transaction-id
-  (fn [db [_ id]]
-    (assoc db :transaction-id id)))
+  (fn [{:keys [db]} [_ id]]
+    {:db                    (assoc db :transaction-id id)
+     ::transaction-interval {:action      :stop
+                             :interval-id (:interval db)}}))
 
 (re-frame/reg-event-db
   ::set-interval
@@ -22,7 +24,7 @@
 (defn transaction
   "Takes a transaction id and updates state with transaction
   data"
-  [{:keys [db]} id]
+  [_ id]
   {:http-xhrio {:method          :get
                 :uri             (str "https://api.bitkit.live/transactions/" id)
                 :response-format (ajax/json-response-format {:keywords? true})
@@ -35,16 +37,16 @@
   {:db (assoc cofx :db db/default-db)})
 
 (re-frame/reg-event-fx
-  ::update-transaction
-  (fn [cofx [_ txid]]
-    (transaction cofx txid)))
-
-(re-frame/reg-event-fx
   ::set-route
   (fn [cofx [_ {:keys [route-params handler]}]]
     (case handler
       :transaction (transaction cofx (:id route-params))
       (index cofx))))
+
+(re-frame/reg-event-fx
+  ::update-transaction
+  (fn [cofx [_ txid]]
+    (transaction cofx txid)))
 
 (re-frame/reg-event-fx
   ::set-transaction
@@ -56,8 +58,8 @@
   ::fetch-transaction-success
   (fn [{:keys [db]} [_ response]]
     {:db                    (-> db
-                              (assoc :transaction (:data response))
-                              (assoc :error nil))
+                                (assoc :transaction (:data response))
+                                (assoc :error nil))
      ::transaction-interval {:previous-txid (:transaction-id db)
                              :txid          (get-in response [:data :txid])
                              :action        :start
@@ -80,16 +82,27 @@
 
 (re-frame/reg-fx ::set-tx-route set-tx-effect)
 
+(defn stop-interval
+  [{:keys [interval-id]}]
+  (when interval-id
+    (js/clearInterval interval-id)
+    (re-frame/dispatch [::set-interval nil])))
+
+(defn start-interval
+  [{:keys [txid previous-txid interval-id]}]
+  (-> #(re-frame/dispatch [::update-transaction txid])
+      (js/setInterval 5000)
+      (as-> id [::set-interval id])
+      re-frame/dispatch))
+
+(def restart-interval (juxt stop-interval start-interval))
+
 (defn update-interval
-  [{:keys [txid previous-txid action interval-id]}]
+  [{:keys [txid previous-txid action interval-id] :as params}]
   (case action
-    :start (when (or (nil? interval-id) (not= txid previous-txid))
-             (-> #(re-frame/dispatch [::update-transaction txid])
-                  (js/setInterval 5000)
-                  (as-> id [::set-interval id])
-                  re-frame/dispatch))
-    (when interval-id
-      (js/clearInterval interval-id)
-      (re-frame/dispatch [::set-interval nil]))))
+    :start (if (or (nil? interval-id) (not= txid previous-txid))
+             (start-interval params)
+             (restart-interval params))
+    (stop-interval params)))
 
 (re-frame/reg-fx ::transaction-interval update-interval)
