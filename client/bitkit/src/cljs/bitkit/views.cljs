@@ -28,14 +28,18 @@
 (defn notification
   [{:keys [error]}]
   (when error
-    [:div.notification.is-warning.content
-     [:p
-      "The given transaction ID could not be found in the mempool.
+    (if (= error :left-mempool)
+      [:div.notification.is-success.content
+       [:p "Your transaction has left the mempool!"]]
+      
+      [:div.notification.is-warning.content
+       [:p
+        "The given transaction ID could not be found in the mempool.
       This can happen for a variety of reasons:"]
-     [:ul
-      [:li "The transaction ID was entered incorrectly"]
-      [:li "The transaction has already been confirmed"]
-      [:li "The transaction has been evicted"]]]))
+       [:ul
+        [:li "The transaction ID was entered incorrectly"]
+        [:li "The transaction has already been confirmed"]
+        [:li "The transaction has been evicted"]]])))
 
 (defn transaction
   [{:keys [txn]}]

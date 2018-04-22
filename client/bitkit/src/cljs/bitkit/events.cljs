@@ -24,12 +24,12 @@
 (defn transaction
   "Takes a transaction id and updates state with transaction
   data"
-  [_ id]
+  [{:keys [db]} id]
   {:http-xhrio {:method          :get
                 :uri             (str "https://api.bitkit.live/transactions/" id)
                 :response-format (ajax/json-response-format {:keywords? true})
                 :on-success      [::fetch-transaction-success]
-                :on-failure      [::fetch-transaction-error]}
+                :on-failure      [::fetch-transaction-error (:interval db)]}
    :dispatch   [::set-transaction-id id]})
 
 (defn index
@@ -67,10 +67,14 @@
 
 (re-frame/reg-event-fx
   ::fetch-transaction-error
-  (fn [{:keys [db]}]
-    {:db                    (merge db/default-db {:error :not-found})
-     ::transaction-interval {:action      :stop
-                             :interval-id (:interval db)}}))
+  (fn [_ [_ interval-id]]
+    {:db
+     (merge db/default-db {:error
+                           (if interval-id :left-mempool :not-found)})
+     
+     ::transaction-interval
+     {:action      :stop
+      :interval-id interval-id}}))
 
 ;;; Side effects
 
