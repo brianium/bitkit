@@ -3,4 +3,5 @@
 (def default-db
   {:transaction-id nil
    :transaction    nil
-   :error          nil})
+   :error          nil
+   :interval       nil})
