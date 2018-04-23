@@ -25,5 +25,6 @@
             (assoc :fee_rate (gstring/format "%.1f" fee_rate))
             (assoc :capacity_used
               (-> (/ total_weight blocksize-in-bytes)
+                  (* 100)
                   (as-> capacity (gstring/format "%.1f" capacity))
                   (str "%"))))))))
