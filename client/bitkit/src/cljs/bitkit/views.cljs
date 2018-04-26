@@ -15,7 +15,9 @@
 
 (defn transaction-form
   [{:keys [txid]}]
-  [:form.content {:on-submit (handler #(set-path! (str "/" txid)))}
+  [:form.content
+   {:on-submit
+    (handler #(re-frame/dispatch [::events/set-transaction txid]))}
    [:div.field
     [:label.label "Transaction ID"]
     [:div.control
@@ -26,14 +28,40 @@
 (defn notification
   [{:keys [error]}]
   (when error
-    [:div.notification.is-warning.content
-     [:p
-      "The given transaction ID could not be found in the mempool.
+    (if (= error :left-mempool)
+      [:div.notification.is-success.content
+       [:p "Your transaction has left the mempool!"]]
+      
+      [:div.notification.is-warning.content
+       [:p
+        "The given transaction ID could not be found in the mempool.
       This can happen for a variety of reasons:"]
-     [:ul
-      [:li "The transaction ID was entered incorrectly"]
-      [:li "The transaction has already been confirmed"]
-      [:li "The transaction has been evicted"]]]))
+       [:ul
+        [:li "The transaction ID was entered incorrectly"]
+        [:li "The transaction has already been confirmed"]
+        [:li "The transaction has been evicted"]]])))
+
+(defn interval-list
+  [& children]
+  (let [ref (atom nil)]
+    (reagent/create-class
+      {:component-did-update
+       (fn []
+         (-> @ref
+             .-classList
+             (.add "is-updated"))
+         (js/setTimeout
+           (fn []
+             (-> @ref
+                 .-classList
+                 (.remove "is-updated")))
+           1500))
+       :reagent-render
+       (fn [& children]
+         [:div.interval-list {:ref (fn [elem] (reset! ref elem))}
+          [:ul
+           {:class-name (str "is-marginless is-unstyled is-size-6")}
+           (map-indexed #(with-meta %2 {:key %1}) children)]])})))
 
 (defn transaction
   [{:keys [txn]}]
@@ -41,12 +69,12 @@
     [:section
      [:div.content.is-small
       [:h2 "Your transaction"]
-      [:ul.is-marginless.is-unstyled
+      [interval-list
        [:li (str "Fee: " (:fee txn) " satoshis")]
        [:li (str "Fee rate: " (:fee_rate txn) " satoshis per byte")]]]
      [:div.content.is-small
       [:h2 "Transactions with a higher fee rate"]
-      [:ul.is-marginless.is-unstyled
+      [interval-list
        [:li (str "Count: " (:transaction_count txn))]
        [:li (str "Block capacity used: " (:capacity_used txn))]]]]))
 

@@ -11,9 +11,30 @@
     top: 2px;
 }
 
+h2 {
+    color: #004A7C !important;
+    text-decoration: underline;
+    margin-bottom: 1em;
+}
+
 /**
  * List
  */
 .is-unstyled {
     list-style: none !important;
+}
+
+
+@keyframes yellow-fade {
+    0%   { background: none; }
+    50%  { background: cornsilk; }
+    100% { background: none; }
+}
+
+.interval-list {
+    padding: 5px;
+}
+
+.interval-list.is-updated {
+    animation: yellow-fade 1s ease-in 1;
 }
