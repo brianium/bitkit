@@ -10,6 +10,7 @@ type Transaction struct {
 	ID               string  `json:"txid"`
 	FeeRate          float32 `json:"fee_rate"`
 	Weight           int     `json:"weight"`
+	Fee				 int     `json:"fee"`
 	TransactionCount int     `json:"transaction_count"`
 	TotalWeight      int     `json:"total_weight"`
 }
@@ -20,20 +21,22 @@ func insertTransactions(db *DB, transactions []*Transaction) error {
 	valueArgs := make([]interface{}, 0, length*3)
 	i := 0
 	for _, transaction := range transactions {
-		valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d)", i*3+1, i*3+2, i*3+3))
+		valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d, $%d)", i*3+1, i*3+2, i*3+3, i*3+4))
 		valueArgs = append(valueArgs, transaction.ID)
 		valueArgs = append(valueArgs, transaction.FeeRate)
 		valueArgs = append(valueArgs, transaction.Weight)
+		valueArgs = append(valueArgs, transaction.Fee)
 		i++
 	}
 
 	sql := `
-	INSERT INTO bitkit.transactions (id, fee_rate, weight)
+	INSERT INTO bitkit.transactions (id, fee_rate, weight, fee)
 	VALUES %s
 	ON CONFLICT (id)
 	DO UPDATE SET
     	fee_rate = EXCLUDED.fee_rate,
-    	weight = EXCLUDED.weight
+		weight = EXCLUDED.weight,
+		fee = EXCLUDED.fee
 	`
 	stmt := fmt.Sprintf(sql, strings.Join(valueStrings, ","))
 	_, err := db.Exec(stmt, valueArgs...)
@@ -91,11 +94,11 @@ func (db *DB) ReplaceTransactions(transactions []*Transaction) (err error) {
 func (db *DB) GetTransaction(id string) (*Transaction, error) {
 	sql := `
 	WITH fr as (
-		SELECT id, fee_rate, weight
+		SELECT id, fee_rate, weight, fee
 		FROM bitkit.transactions
 		WHERE id = $1
 	)
-	SELECT fr.id, fr.fee_rate, fr.weight, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
+	SELECT fr.id, fr.fee_rate, fr.weight, fr.fee, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
 	FROM bitkit.transactions as tx
 	JOIN fr ON tx.fee_rate >= fr.fee_rate
 	GROUP BY fr.id, fr.fee_rate, fr.weight
@@ -109,14 +112,15 @@ func (db *DB) GetTransaction(id string) (*Transaction, error) {
 		txID             string
 		feeRate          float32
 		weight           int
+		fee				 int
 		transactionCount int
 		totalWeight      int
 	)
-	err = stmt.QueryRow(id).Scan(&txID, &feeRate, &weight, &transactionCount, &totalWeight)
+	err = stmt.QueryRow(id).Scan(&txID, &feeRate, &weight, &fee, &transactionCount, &totalWeight)
 	if err != nil {
 		return nil, err
 	}
-	return &Transaction{txID, feeRate, weight, transactionCount, totalWeight}, nil
+	return &Transaction{txID, feeRate, weight, fee, transactionCount, totalWeight}, nil
 }
 
 // GetRandomTransaction returns a random transaction record with a count of transactions ahead of it
@@ -124,12 +128,12 @@ func (db *DB) GetTransaction(id string) (*Transaction, error) {
 func (db *DB) GetRandomTransaction() (*Transaction, error) {
 	sql := `
 	WITH fr as (
-		SELECT id, fee_rate, weight
+		SELECT id, fee_rate, weight, fee
 		FROM bitkit.transactions
 		OFFSET floor(random() * (select count(*)-1 from bitkit.transactions))
 		LIMIT 1
 	)
-	SELECT fr.id, fr.fee_rate, fr.weight, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
+	SELECT fr.id, fr.fee_rate, fr.weight, fr.fee, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
 	FROM bitkit.transactions as tx
 	JOIN fr ON tx.fee_rate >= fr.fee_rate
 	GROUP BY fr.id, fr.fee_rate, fr.weight
@@ -138,12 +142,13 @@ func (db *DB) GetRandomTransaction() (*Transaction, error) {
 		txID             string
 		feeRate          float32
 		weight           int
+		fee				 int
 		transactionCount int
 		totalWeight      int
 	)
-	err := db.QueryRow(sql).Scan(&txID, &feeRate, &weight, &transactionCount, &totalWeight)
+	err := db.QueryRow(sql).Scan(&txID, &feeRate, &weight, &fee, &transactionCount, &totalWeight)
 	if err != nil {
 		return nil, err
 	}
-	return &Transaction{txID, feeRate, weight, transactionCount, totalWeight}, nil
+	return &Transaction{txID, feeRate, weight, fee, transactionCount, totalWeight}, nil
 }
