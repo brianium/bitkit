@@ -62,9 +62,10 @@ def extract_and_transform(current_mempool, sent_txids):
     for txid, info in current_mempool.items():
         fee_rate = mining_fee_rate[txid]
         if txid not in sent_txids or sent_txids[txid] != fee_rate:
-            vsize = int(float(info['size'])) # float(info['fee']) * 1e8
+            vsize = int(float(info['size']))
+            fee = int(float(info['fee']) * 1e8)
             sent_txids[txid] = fee_rate
-            new_txs.append({'txid': txid, 'fee_rate': fee_rate, 'weight': vsize})
+            new_txs.append({'txid': txid, 'fee_rate': fee_rate, 'weight': vsize, 'fee': fee})
     return new_txs
 
 def call_api(new_txs, method):
