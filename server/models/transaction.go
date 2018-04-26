@@ -10,7 +10,7 @@ type Transaction struct {
 	ID               string  `json:"txid"`
 	FeeRate          float32 `json:"fee_rate"`
 	Weight           int     `json:"weight"`
-	Fee				 int     `json:"fee"`
+	Fee              int     `json:"fee"`
 	TransactionCount int     `json:"transaction_count"`
 	TotalWeight      int     `json:"total_weight"`
 }
@@ -34,9 +34,9 @@ func insertTransactions(db *DB, transactions []*Transaction) error {
 	VALUES %s
 	ON CONFLICT (id)
 	DO UPDATE SET
-    	fee_rate = EXCLUDED.fee_rate,
-		weight = EXCLUDED.weight,
-		fee = EXCLUDED.fee
+        fee_rate = EXCLUDED.fee_rate,
+        weight = EXCLUDED.weight,
+        fee = EXCLUDED.fee
 	`
 	stmt := fmt.Sprintf(sql, strings.Join(valueStrings, ","))
 	_, err := db.Exec(stmt, valueArgs...)
@@ -112,7 +112,7 @@ func (db *DB) GetTransaction(id string) (*Transaction, error) {
 		txID             string
 		feeRate          float32
 		weight           int
-		fee				 int
+		fee              int
 		transactionCount int
 		totalWeight      int
 	)
@@ -142,7 +142,7 @@ func (db *DB) GetRandomTransaction() (*Transaction, error) {
 		txID             string
 		feeRate          float32
 		weight           int
-		fee				 int
+		fee              int
 		transactionCount int
 		totalWeight      int
 	)
