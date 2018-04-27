@@ -18,10 +18,10 @@ type Transaction struct {
 func insertTransactions(db *DB, transactions []*Transaction) error {
 	length := len(transactions)
 	valueStrings := make([]string, 0, length)
-	valueArgs := make([]interface{}, 0, length*3)
+	valueArgs := make([]interface{}, 0, length*4)
 	i := 0
 	for _, transaction := range transactions {
-		valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d, $%d)", i*3+1, i*3+2, i*3+3, i*3+4))
+		valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d, $%d)", i*4+1, i*4+2, i*4+3, i*4+4))
 		valueArgs = append(valueArgs, transaction.ID)
 		valueArgs = append(valueArgs, transaction.FeeRate)
 		valueArgs = append(valueArgs, transaction.Weight)
