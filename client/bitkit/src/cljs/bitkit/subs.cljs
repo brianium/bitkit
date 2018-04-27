@@ -3,7 +3,7 @@
             [goog.string :as gstring]
             [goog.string.format]))
 
-(def blocksize-in-bytes 1048576)
+(def blocksize-in-bytes 1000000)
 
 (re-frame/reg-sub
  ::transaction-id
@@ -19,10 +19,9 @@
   ::transaction
   (fn [{:keys [transaction]}]
     (when transaction
-      (let [{:keys [fee_rate, weight, total_weight]} transaction]
+      (let [{:keys [fee, weight, total_weight]} transaction]
         (-> transaction
-            (assoc :fee (Math/round (* fee_rate weight)))
-            (assoc :fee_rate (gstring/format "%.1f" fee_rate))
+            (assoc :fee_rate (gstring/format "%.1f" (/ fee weight)))
             (assoc :capacity_used
               (-> (/ total_weight blocksize-in-bytes)
                   (* 100)
