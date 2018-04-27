@@ -91,3 +91,11 @@ $ make client
 ```
 
 From the project root.
+
+## Data
+
+There are some outstanding field naming issues.
+
+`fee_rate` is what I would prefer to call `mining_fee_rate`. It's the effective fee rate of the transaction considering ancestors and descendants as most miners would. Unless a transaction has no ancestors or descendants, it may be different than fee / vsize for the given transaction. Child Pays For Parent (CPFP) necessitates inclusion of parent transactions with or before child transactions.
+
+`weight` is really `vsize` for the given transaction only (no ancestors or descendants).
