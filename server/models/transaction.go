@@ -101,7 +101,7 @@ func (db *DB) GetTransaction(id string) (*Transaction, error) {
 	SELECT fr.id, fr.fee_rate, fr.weight, fr.fee, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
 	FROM bitkit.transactions as tx
 	JOIN fr ON tx.fee_rate >= fr.fee_rate
-	GROUP BY fr.id, fr.fee_rate, fr.weight
+	GROUP BY fr.id, fr.fee_rate, fr.weight, fr.fee
 	`
 	stmt, err := db.Prepare(sql)
 	if err != nil {
@@ -136,7 +136,7 @@ func (db *DB) GetRandomTransaction() (*Transaction, error) {
 	SELECT fr.id, fr.fee_rate, fr.weight, fr.fee, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
 	FROM bitkit.transactions as tx
 	JOIN fr ON tx.fee_rate >= fr.fee_rate
-	GROUP BY fr.id, fr.fee_rate, fr.weight
+	GROUP BY fr.id, fr.fee_rate, fr.weight, fr.fee
 	`
 	var (
 		txID             string
