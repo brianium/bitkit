@@ -103,6 +103,10 @@ type TransactionResponse struct {
 	Data *models.Transaction `json:"data"`
 }
 
+type TransactionIDResponse struct {
+	Data *models.TransactionID `json:"data"`
+}
+
 func (env *Env) transaction(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	txID := vars["id"]
@@ -124,7 +128,7 @@ func (env *Env) randomTransaction(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(&TransactionResponse{tx})
+	json.NewEncoder(w).Encode(&TransactionIDResponse{tx})
 }
 
 // ********** Helper Functions ********** //
