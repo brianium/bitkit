@@ -1,0 +1,17 @@
+[Unit]
+Description=lnd
+After=network.target bitcoind.service
+
+[Service]
+EnvironmentFile=/home/ryan/systemdenv
+User=ryan
+Type=forking
+PIDFile=/home/ryan/lnd.pid
+ExecStart=/home/ryan/gocode/bin/lnd
+KillMode=process
+Restart=always
+TimeoutSec=infinity
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
