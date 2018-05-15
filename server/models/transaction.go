@@ -7,12 +7,18 @@ import (
 
 // Transaction represents a transaction in the mempool
 type Transaction struct {
-	ID               string  `json:"txid"`
-	FeeRate          float32 `json:"fee_rate"`
-	Weight           int     `json:"weight"`
-	Fee              int     `json:"fee"`
-	TransactionCount int     `json:"transaction_count"`
-	TotalWeight      int     `json:"total_weight"`
+	ID                      string  `json:"txid"`
+	FeeRate                 float32 `json:"fee_rate"`
+	Weight                  int     `json:"weight"`
+	Fee                     int     `json:"fee"`
+	TransactionCount        int     `json:"transaction_count"`
+	TotalWeight             int     `json:"total_weight"`
+	MempoolTransactionCount int     `json:"mempool_transaction_count"`
+	MempoolTotalVirtualSize int     `json:"mempool_total_virtual_size"`
+}
+
+type TransactionID struct {
+	ID string `json:"txid"`
 }
 
 func insertTransactions(db *DB, transactions []*Transaction) error {
@@ -98,9 +104,13 @@ func (db *DB) GetTransaction(id string) (*Transaction, error) {
 		FROM bitkit.transactions
 		WHERE id = $1
 	)
-	SELECT fr.id, fr.fee_rate, fr.weight, fr.fee, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
+	SELECT fr.id, fr.fee_rate, fr.weight, fr.fee, 
+	SUM(CASE WHEN tx.fee_rate >= fr.fee_rate THEN 1 ELSE 0 END) - 1 as transaction_count, 
+	SUM(CASE WHEN tx.fee_rate >= fr.fee_rate THEN tx.weight ELSE 0 END) - fr.weight as total_weight,
+	SUM(1) as mempool_transaction_count,
+	SUM(tx.weight) as mempool_total_virtual_size
 	FROM bitkit.transactions as tx
-	JOIN fr ON tx.fee_rate >= fr.fee_rate
+	CROSS JOIN fr
 	GROUP BY fr.id, fr.fee_rate, fr.weight, fr.fee
 	`
 	stmt, err := db.Prepare(sql)
@@ -109,46 +119,37 @@ func (db *DB) GetTransaction(id string) (*Transaction, error) {
 	}
 	defer stmt.Close()
 	var (
-		txID             string
-		feeRate          float32
-		weight           int
-		fee              int
-		transactionCount int
-		totalWeight      int
+		txID                    string
+		feeRate                 float32
+		weight                  int
+		fee                     int
+		transactionCount        int
+		totalWeight             int
+		mempoolTransactionCount int
+		mempoolTotalVirtualSize int
 	)
-	err = stmt.QueryRow(id).Scan(&txID, &feeRate, &weight, &fee, &transactionCount, &totalWeight)
+	err = stmt.QueryRow(id).Scan(&txID, &feeRate, &weight, &fee, &transactionCount, &totalWeight, &mempoolTransactionCount, &mempoolTotalVirtualSize)
 	if err != nil {
 		return nil, err
 	}
-	return &Transaction{txID, feeRate, weight, fee, transactionCount, totalWeight}, nil
+	return &Transaction{txID, feeRate, weight, fee, transactionCount, totalWeight, mempoolTransactionCount, mempoolTotalVirtualSize}, nil
 }
 
 // GetRandomTransaction returns a random transaction record with a count of transactions ahead of it
 // and the total weight of all transactions being queried
-func (db *DB) GetRandomTransaction() (*Transaction, error) {
+func (db *DB) GetRandomTransaction() (*TransactionID, error) {
 	sql := `
-	WITH fr as (
-		SELECT id, fee_rate, weight, fee
-		FROM bitkit.transactions
-		OFFSET floor(random() * (select count(*)-1 from bitkit.transactions))
-		LIMIT 1
-	)
-	SELECT fr.id, fr.fee_rate, fr.weight, fr.fee, COUNT(tx.id) - 1 as transaction_count, SUM(tx.weight) - fr.weight as total_weight
-	FROM bitkit.transactions as tx
-	JOIN fr ON tx.fee_rate >= fr.fee_rate
-	GROUP BY fr.id, fr.fee_rate, fr.weight, fr.fee
+	SELECT id
+	FROM bitkit.transactions
+	OFFSET floor(random() * (select count(*)-1 from bitkit.transactions))
+	LIMIT 1
 	`
 	var (
-		txID             string
-		feeRate          float32
-		weight           int
-		fee              int
-		transactionCount int
-		totalWeight      int
+		txID string
 	)
-	err := db.QueryRow(sql).Scan(&txID, &feeRate, &weight, &fee, &transactionCount, &totalWeight)
+	err := db.QueryRow(sql).Scan(&txID)
 	if err != nil {
 		return nil, err
 	}
-	return &Transaction{txID, feeRate, weight, fee, transactionCount, totalWeight}, nil
+	return &TransactionID{txID}, nil
 }

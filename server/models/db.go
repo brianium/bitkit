@@ -11,7 +11,7 @@ type Datastore interface {
 	InsertTransactions(transactions []*Transaction) error
 	ReplaceTransactions(transactions []*Transaction) error
 	GetTransaction(id string) (*Transaction, error)
-	GetRandomTransaction() (*Transaction, error)
+	GetRandomTransaction() (*TransactionID, error)
 }
 
 // DB is the type all database logic is implemented against
