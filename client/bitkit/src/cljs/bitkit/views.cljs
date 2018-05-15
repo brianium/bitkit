@@ -71,12 +71,18 @@
       [:h2 "Your transaction"]
       [interval-list
        [:li (str "Fee: " (:fee txn) " satoshis")]
-       [:li (str "Fee rate: " (:fee_rate txn) " satoshis per byte")]]]
+       [:li (str "Fee rate: " (:fee_rate txn) " satoshis per vbyte")]
+       [:li (str "Virtual size: " (:weight txn) " vbytes")]]]
      [:div.content.is-small
       [:h2 "Transactions with a higher fee rate"]
       [interval-list
        [:li (str "Count: " (:transaction_count txn))]
-       [:li (str "Block capacity used: " (:capacity_used txn))]]]]))
+       [:li (str "Block capacity used: " (:capacity_used txn))]]]
+     [:div.content.is-small
+      [:h2 "Entire mempool"]
+      [interval-list
+       [:li (str "Count: " (:mempool_transaction_count txn))]
+       [:li (str "Virtual size: " (:mempool_total_virtual_size txn) " vbytes")]]]]))
 
 (defn main-panel []
   (let [txid  (re-frame/subscribe [::subs/transaction-id])
