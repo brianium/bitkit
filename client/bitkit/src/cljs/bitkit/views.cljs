@@ -15,13 +15,13 @@
 
 (defn transaction-form
   [{:keys [txid]}]
-  [:form.content
+  [:form
    {:on-submit
     (handler #(re-frame/dispatch [::events/set-transaction txid]))}
    [:div.field
-    [:label.label "Transaction ID"]
+    [:label.label.is-medium "Transaction ID"]
     [:div.control
-     [:input.input
+     [:input.input.is-large
       {:value     txid
        :on-change #(re-frame/dispatch [::events/set-transaction-id (.. % -target -value)])}]]]])
 
@@ -67,28 +67,31 @@
   [{:keys [txn]}]
   (when txn
     [:section
-     [:div.content.is-small
-      [:h2 "Your transaction"]
+     [:div.message.is-info
+      [:h2.message-header "Your transaction"]
       [interval-list
-       [:li (str "Fee: " (:fee txn) " satoshis")]
-       [:li (str "Fee rate: " (:fee_rate txn) " satoshis per vbyte")]
-       [:li (str "Virtual size: " (:weight txn) " vbytes")]]]
-     [:div.content.is-small
-      [:h2 "Transactions with a higher fee rate"]
+       [:div.message-body
+        [:li (str "Fee: " (:fee txn) " satoshis")]
+        [:li (str "Fee rate: " (:fee_rate txn) " satoshis per vbyte")]
+        [:li (str "Virtual size: " (:weight txn) " vbytes")]]]]
+     [:div.message.is-info
+      [:h2.message-header "Transactions with a higher fee rate"]
       [interval-list
-       [:li (str "Count: " (:transaction_count txn))]
-       [:li (str "Block capacity used: " (:capacity_used txn))]]]
-     [:div.content.is-small
-      [:h2 "Entire mempool"]
+       [:div.message-body
+        [:li (str "Count: " (:transaction_count txn))]
+        [:li (str "Block capacity used: " (:capacity_used txn))]]]]
+     [:div.message.is-info
+      [:h2.message-header "Entire mempool"]
       [interval-list
-       [:li (str "Count: " (:mempool_transaction_count txn))]
-       [:li (str "Virtual size: " (:mempool_total_virtual_size txn) " vbytes")]]]]))
+       [:div.message-body
+        [:li (str "Count: " (:mempool_transaction_count txn))]
+        [:li (str "Virtual size: " (:mempool_total_virtual_size txn) " vbytes")]]]]]))
 
 (defn main-panel []
   (let [txid  (re-frame/subscribe [::subs/transaction-id])
         txn   (re-frame/subscribe [::subs/transaction])
         error (re-frame/subscribe [::subs/error])]
-    [:section.section
+    [:section.section.main-panel
      [:div.container
       [transaction-form {:txid @txid}]
       [notification {:error @error}]
