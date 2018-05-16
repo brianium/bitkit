@@ -19,7 +19,12 @@
    {:on-submit
     (handler #(re-frame/dispatch [::events/set-transaction txid]))}
    [:div.field
-    [:label.label.is-medium "Transaction ID"]
+    [:div.transaction-label
+     [:label.label.is-medium "Transaction ID"]
+     [:button.button.is-info
+      {:type     "button"
+       :on-click #(re-frame/dispatch [::events/random-transaction])}
+      "random"]]
     [:div.control
      [:input.input.is-large
       {:value     txid
@@ -28,10 +33,12 @@
 (defn notification
   [{:keys [error]}]
   (when error
-    (if (= error :left-mempool)
+    (case error
+      :left-mempool
       [:div.notification.is-success.content
        [:p "Your transaction has left the mempool!"]]
-      
+
+      :not-found
       [:div.notification.is-warning.content
        [:p
         "The given transaction ID could not be found in the mempool.
@@ -39,7 +46,10 @@
        [:ul
         [:li "The transaction ID was entered incorrectly"]
         [:li "The transaction has already been confirmed"]
-        [:li "The transaction has been evicted"]]])))
+        [:li "The transaction has been evicted"]]]
+
+      [:div.notification.is-danger.content
+       :p "An unknown error occurred. Sorry!"])))
 
 (defn interval-list
   [& children]

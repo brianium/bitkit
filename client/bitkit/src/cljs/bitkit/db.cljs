@@ -4,4 +4,5 @@
   {:transaction-id nil
    :transaction    nil
    :error          nil
-   :interval       nil})
+   :interval       nil
+   :ui             {:fetching false}})

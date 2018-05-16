@@ -24,6 +24,24 @@ form {
     margin-bottom: 1.5rem;
 }
 
+.transaction-label {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.transaction-label .label {
+    margin-bottom: 0;
+}
+
+/**
+ * Messages
+ */
+.message-body {
+    border-radius: 0 !important;
+}
+
 /**
  * List
  */
