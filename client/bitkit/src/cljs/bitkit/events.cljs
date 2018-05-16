@@ -1,8 +1,9 @@
 (ns bitkit.events
   (:require [re-frame.core :as re-frame]
+            [ajax.core :as ajax]
             [bitkit.db :as db]
             [bitkit.routes :as routes]
-            [ajax.core :as ajax]))
+            [bitkit.config :as config]))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -26,7 +27,7 @@
   data"
   [{:keys [db]} id]
   {:http-xhrio {:method          :get
-                :uri             (str "https://api.bitkit.live/transactions/" id)
+                :uri             (str config/api-uri "/transactions/" id)
                 :response-format (ajax/json-response-format {:keywords? true})
                 :on-success      [::fetch-transaction-success]
                 :on-failure      [::fetch-transaction-error (:interval db)]}
