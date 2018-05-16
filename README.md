@@ -77,7 +77,7 @@ locally at `http://127.0.0.1:8080/`
 
 The client application is written in ClojureScript using the [re-frame](https://github.com/Day8/re-frame) framework.
 
-To start an interactive development environment, from within the `client` directory
+To start an interactive development environment, from within the `client/bitkit` directory
 run:
 
 ```
