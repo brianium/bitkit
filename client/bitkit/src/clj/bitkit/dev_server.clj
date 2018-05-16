@@ -6,7 +6,8 @@
   (fn [request]
     (next-handler
      (if (or (starts-with? (:uri request) "/css/")
-             (starts-with? (:uri request) "/js/"))
+             (starts-with? (:uri request) "/js/")
+             (starts-with? (:uri request) "/bitcoin.html"))
        request
        (assoc request :uri "/index.html")))))
 
