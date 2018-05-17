@@ -1,8 +1,21 @@
 /**
+ * Container
+ */
+.container {
+    max-width: 800px !important;
+}
+
+/**
+ * Main Panel
+ */
+.main-panel {
+    padding-top: 1.5rem;
+}
+
+/**
  * Navbar
  */
 .navbar {
-    background-color: #004A7C;
     padding: 0 10px;
 }
 
@@ -11,10 +24,40 @@
     top: 2px;
 }
 
-h2 {
-    color: #004A7C !important;
-    text-decoration: underline;
-    margin-bottom: 1em;
+.navbar .container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+/** hack for bulma hover colors **/
+.navbar-item.has-text-white:hover {
+    background-color: #2366d1 !important;
+}
+
+/**
+ * Form
+ */
+form {
+    margin-bottom: 1.5rem;
+}
+
+.transaction-label {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.transaction-label .label {
+    margin-bottom: 0;
+}
+
+/**
+ * Messages
+ */
+.message-body {
+    border-radius: 0 !important;
 }
 
 /**
@@ -29,10 +72,6 @@ h2 {
     0%   { background: none; }
     50%  { background: cornsilk; }
     100% { background: none; }
-}
-
-.interval-list {
-    padding: 5px;
 }
 
 .interval-list.is-updated {

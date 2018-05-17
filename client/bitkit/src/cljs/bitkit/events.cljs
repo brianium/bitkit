@@ -1,8 +1,9 @@
 (ns bitkit.events
   (:require [re-frame.core :as re-frame]
+            [ajax.core :as ajax]
             [bitkit.db :as db]
             [bitkit.routes :as routes]
-            [ajax.core :as ajax]))
+            [bitkit.config :as config]))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -26,7 +27,7 @@
   data"
   [{:keys [db]} id]
   {:http-xhrio {:method          :get
-                :uri             (str "https://api.bitkit.live/transactions/" id)
+                :uri             (str config/api-uri "/transactions/" id)
                 :response-format (ajax/json-response-format {:keywords? true})
                 :on-success      [::fetch-transaction-success]
                 :on-failure      [::fetch-transaction-error (:interval db)]}
@@ -59,7 +60,8 @@
   (fn [{:keys [db]} [_ response]]
     {:db                    (-> db
                                 (assoc :transaction (:data response))
-                                (assoc :error nil))
+                                (assoc :error nil)
+                                (assoc-in [:ui :fetching] false))
      ::transaction-interval {:previous-txid (:transaction-id db)
                              :txid          (get-in response [:data :txid])
                              :action        :start
@@ -75,6 +77,26 @@
      ::transaction-interval
      {:action      :stop
       :interval-id interval-id}}))
+
+(re-frame/reg-event-fx
+  ::random-transaction
+  (fn [{:keys [db]}]
+    {:db (assoc-in db [:ui :fetching] true)}
+    {:http-xhrio {:method          :get
+                  :uri             (str config/api-uri "/transactions/random")
+                  :response-format (ajax/json-response-format {:keywords? true})
+                  :on-success      [::fetch-random-success]
+                  :on-failure      [::fetch-random-error]}}))
+
+(re-frame/reg-event-fx
+  ::fetch-random-success
+  (fn [_ [_ response]]
+    {:dispatch [::set-transaction (get-in response [:data :txid])]}))
+
+(re-frame/reg-event-db
+  ::fetch-random-error
+  (fn [db]
+    (merge db/default-db {:error :unknown})))
 
 ;;; Side effects
 
