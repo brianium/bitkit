@@ -53,11 +53,18 @@ form {
     margin-bottom: 0;
 }
 
+.submit {
+    cursor: pointer;
+    height: 100%;
+    width: 50px;
+}
+
 /**
  * Messages
  */
 .message-body {
     border-radius: 0 !important;
+    border-width: 0px 1px 1px 1px !important;
 }
 
 /**
