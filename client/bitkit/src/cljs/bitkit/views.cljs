@@ -24,11 +24,15 @@
      [:button.button.is-info
       {:type     "button"
        :on-click #(re-frame/dispatch [::events/random-transaction])}
-      "random"]]
-    [:div.control
-     [:input.input.is-large
-      {:value     txid
-       :on-change #(re-frame/dispatch [::events/set-transaction-id (.. % -target -value)])}]]]])
+      "random"]]]
+   [:div.field.has-addons.has-addons-right
+     [:div.control.is-expanded
+      [:input.input.is-large
+       {:value     txid
+        :on-change #(re-frame/dispatch [::events/set-transaction-id (.. % -target -value)])}]]
+     [:div.control
+      [:button.button.is-info.submit
+       [:i.fas.fa-search]]]]])
 
 (defn notification
   [{:keys [error]}]
