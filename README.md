@@ -1,5 +1,13 @@
 # bitkit
 
+Formerly hosted at https://bitkit.live. Now defunct, but left here because it was a fun and cool project.
+
+Highlights:
+
+* A web server written in Go for use via AWS Lambda and API Gateway
+* An app written in python for pushing bitcoin mempool data to the Go API
+* A ClojureScript frontend for viewing transactions as they move through the mempool
+
 ## Requirements
 
 * [Docker](https://www.docker.com/) (optional for dev)
